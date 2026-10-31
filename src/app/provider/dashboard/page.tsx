@@ -25,6 +25,7 @@ import {
 } from 'lucide-react';
 import { Booking, ProviderProfile, ServiceItem, PriceType } from '@/types';
 import { getStoredSession } from '@/lib/auth-client';
+import RoleGuard from '@/components/RoleGuard';
 
 export default function ProviderDashboardPage() {
   const [currentProviderId, setCurrentProviderId] = useState<string>('prov-karim-meca');
@@ -157,7 +158,8 @@ export default function ProviderDashboardPage() {
     .reduce((sum, b) => sum + (b.servicePrice || 0), 0);
 
   return (
-    <div className="bg-slate-50 min-h-screen py-8">
+    <RoleGuard allowedRoles={['PROVIDER']}>
+      <div className="bg-slate-50 min-h-screen py-8">
       <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 space-y-8">
         {/* Top Header */}
         <div className="flex flex-col sm:flex-row items-start sm:items-center justify-between gap-4 p-5 bg-white rounded-3xl border border-slate-200/80 shadow-sm">
@@ -629,5 +631,6 @@ export default function ProviderDashboardPage() {
         )}
       </div>
     </div>
+    </RoleGuard>
   );
 }

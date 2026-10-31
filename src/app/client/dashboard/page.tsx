@@ -17,6 +17,7 @@ import {
 } from 'lucide-react';
 import { Booking } from '@/types';
 import ReviewModal from '@/components/ReviewModal';
+import RoleGuard from '@/components/RoleGuard';
 
 export default function ClientDashboardPage() {
   const [bookings, setBookings] = useState<Booking[]>([]);
@@ -88,7 +89,8 @@ export default function ClientDashboardPage() {
   });
 
   return (
-    <div className="bg-slate-50 min-h-screen py-10">
+    <RoleGuard allowedRoles={['CLIENT']}>
+      <div className="bg-slate-50 min-h-screen py-10">
       <div className="max-w-5xl mx-auto px-4 sm:px-6 lg:px-8 space-y-8">
         {/* Header */}
         <div className="flex flex-col sm:flex-row items-start sm:items-center justify-between gap-4">
@@ -240,5 +242,6 @@ export default function ClientDashboardPage() {
         />
       )}
     </div>
+    </RoleGuard>
   );
 }

@@ -1,6 +1,6 @@
 'use client';
 
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
 import Link from 'next/link';
 import { useRouter } from 'next/navigation';
 import { 
@@ -23,6 +23,7 @@ import { INITIAL_CATEGORIES, INITIAL_PROVIDERS } from '@/lib/data-store';
 import ProviderCard from '@/components/ProviderCard';
 import BookingModal from '@/components/BookingModal';
 import { ProviderProfile } from '@/types';
+import { getStoredSession, AuthSession } from '@/lib/auth-client';
 
 export default function HomePage() {
   const router = useRouter();
@@ -31,6 +32,11 @@ export default function HomePage() {
   const [isLocating, setIsLocating] = useState<boolean>(false);
   const [userCoords, setUserCoords] = useState<{ lat: number; lng: number } | null>(null);
   const [selectedProviderForBooking, setSelectedProviderForBooking] = useState<ProviderProfile | null>(null);
+  const [session, setSession] = useState<AuthSession | null>(null);
+
+  useEffect(() => {
+    setSession(getStoredSession());
+  }, []);
 
   // Quick category icons mapper
   const getCategoryIcon = (slug: string) => {
@@ -110,7 +116,32 @@ export default function HomePage() {
           </p>
 
           {/* Search Box Card */}
-          <div className="pt-4 max-w-4xl mx-auto">
+          <div className="pt-4 max-w-4xl mx-auto space-y-4">
+            {session?.user.role === 'PROVIDER' && (
+              <div className="p-4 bg-amber-500/20 border border-amber-400/40 rounded-2xl backdrop-blur-md flex flex-col sm:flex-row items-center justify-between gap-3 text-left">
+                <div className="flex items-center gap-3">
+                  <div className="p-2 rounded-xl bg-amber-500 text-white shrink-0">
+                    <Wrench className="w-5 h-5" />
+                  </div>
+                  <div>
+                    <h4 className="text-xs sm:text-sm font-bold text-white">
+                      Vous êtes connecté en tant que prestataire ({session.user.name})
+                    </h4>
+                    <p className="text-[11px] text-amber-200">
+                      Gérez vos interventions, modifiez vos tarifs et consultez vos demandes en attente.
+                    </p>
+                  </div>
+                </div>
+                <Link
+                  href="/provider/dashboard"
+                  className="shrink-0 px-4 py-2 bg-amber-500 hover:bg-amber-600 text-white font-bold text-xs rounded-xl shadow-md transition flex items-center gap-1.5"
+                >
+                  <span>Mon Cockpit Pro</span>
+                  <ArrowRight className="w-3.5 h-3.5" />
+                </Link>
+              </div>
+            )}
+
             <form
               onSubmit={handleSearchSubmit}
               className="bg-white text-slate-800 p-4 sm:p-5 rounded-3xl shadow-2xl border border-white/20 backdrop-blur-lg flex flex-col md:flex-row items-stretch gap-3 text-left"
