@@ -1,8 +1,8 @@
 'use client';
 
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
 import Link from 'next/link';
-import { usePathname } from 'next/navigation';
+import { usePathname, useRouter } from 'next/navigation';
 import { 
   MapPin, 
   Search, 
@@ -11,12 +11,33 @@ import {
   Menu, 
   X, 
   ShieldCheck,
-  UserCheck
+  User,
+  LogIn,
+  UserPlus,
+  LogOut
 } from 'lucide-react';
+import { getStoredSession, clearSession, AuthSession } from '@/lib/auth-client';
 
 export default function Navbar() {
   const [mobileMenuOpen, setMobileMenuOpen] = useState(false);
+  const [session, setSession] = useState<AuthSession | null>(null);
   const pathname = usePathname();
+  const router = useRouter();
+
+  const syncAuth = () => {
+    setSession(getStoredSession());
+  };
+
+  useEffect(() => {
+    syncAuth();
+    window.addEventListener('auth_change', syncAuth);
+    return () => window.removeEventListener('auth_change', syncAuth);
+  }, []);
+
+  const handleLogout = () => {
+    clearSession();
+    router.push('/');
+  };
 
   const navLinks = [
     { name: 'Trouver un service', href: '/search', icon: Search },
@@ -65,15 +86,48 @@ export default function Navbar() {
             })}
           </nav>
 
-          {/* Quick Actions */}
+          {/* Auth State & Quick Actions */}
           <div className="hidden sm:flex items-center gap-3">
-            <Link
-              href="/search"
-              className="inline-flex items-center gap-2 px-4 py-2 text-sm font-medium text-white bg-blue-600 rounded-lg hover:bg-blue-700 active:bg-blue-800 shadow-sm shadow-blue-600/30 transition-all hover:shadow-md"
-            >
-              <Search className="w-4 h-4" />
-              <span>Services à proximité</span>
-            </Link>
+            {session ? (
+              <div className="flex items-center gap-2">
+                <Link
+                  href={session.user.role === 'PROVIDER' ? '/provider/dashboard' : '/client/dashboard'}
+                  className="flex items-center gap-2 px-3 py-1.5 bg-slate-100 hover:bg-slate-200 rounded-xl text-xs font-semibold text-slate-800 transition"
+                >
+                  <div className="w-6 h-6 rounded-full bg-blue-600 text-white flex items-center justify-center text-[10px] font-bold">
+                    {session.user.name.charAt(0)}
+                  </div>
+                  <span className="max-w-[120px] truncate">{session.user.name}</span>
+                  <span className="text-[10px] uppercase font-bold text-blue-600 bg-blue-50 px-1.5 py-0.5 rounded">
+                    {session.user.role === 'PROVIDER' ? 'Pro' : 'Client'}
+                  </span>
+                </Link>
+                <button
+                  onClick={handleLogout}
+                  title="Déconnexion"
+                  className="p-2 text-slate-400 hover:text-rose-600 hover:bg-rose-50 rounded-xl transition"
+                >
+                  <LogOut className="w-4 h-4" />
+                </button>
+              </div>
+            ) : (
+              <div className="flex items-center gap-2">
+                <Link
+                  href="/login"
+                  className="px-3.5 py-2 text-xs font-semibold text-slate-700 hover:text-slate-900 hover:bg-slate-100 rounded-xl transition flex items-center gap-1.5"
+                >
+                  <LogIn className="w-3.5 h-3.5" />
+                  <span>Connexion</span>
+                </Link>
+                <Link
+                  href="/register"
+                  className="px-4 py-2 text-xs font-bold text-white bg-blue-600 hover:bg-blue-700 rounded-xl shadow-sm shadow-blue-500/25 transition flex items-center gap-1.5"
+                >
+                  <UserPlus className="w-3.5 h-3.5" />
+                  <span>Inscription</span>
+                </Link>
+              </div>
+            )}
           </div>
 
           {/* Mobile menu button */}
@@ -91,7 +145,7 @@ export default function Navbar() {
 
       {/* Mobile Drawer */}
       {mobileMenuOpen && (
-        <div className="md:hidden border-b border-slate-200 bg-white px-4 pt-2 pb-4 space-y-1">
+        <div className="md:hidden border-b border-slate-200 bg-white px-4 pt-2 pb-4 space-y-2">
           {navLinks.map((link) => {
             const Icon = link.icon;
             const isActive = pathname === link.href;
@@ -111,15 +165,44 @@ export default function Navbar() {
               </Link>
             );
           })}
-          <div className="pt-2">
-            <Link
-              href="/search"
-              onClick={() => setMobileMenuOpen(false)}
-              className="w-full flex items-center justify-center gap-2 px-4 py-2.5 text-base font-medium text-white bg-blue-600 rounded-lg shadow-sm"
-            >
-              <Search className="w-5 h-5" />
-              <span>Trouver un artisan</span>
-            </Link>
+
+          <div className="pt-2 border-t border-slate-100 flex flex-col gap-2">
+            {session ? (
+              <>
+                <div className="p-3 bg-slate-50 rounded-xl text-xs flex items-center justify-between">
+                  <span className="font-semibold text-slate-800">{session.user.name}</span>
+                  <span className="text-[10px] font-bold text-blue-600 bg-blue-100 px-2 py-0.5 rounded">
+                    {session.user.role}
+                  </span>
+                </div>
+                <button
+                  onClick={() => {
+                    handleLogout();
+                    setMobileMenuOpen(false);
+                  }}
+                  className="w-full py-2.5 text-xs font-semibold text-rose-600 bg-rose-50 rounded-xl"
+                >
+                  Déconnexion
+                </button>
+              </>
+            ) : (
+              <div className="grid grid-cols-2 gap-2">
+                <Link
+                  href="/login"
+                  onClick={() => setMobileMenuOpen(false)}
+                  className="py-2.5 text-center text-xs font-semibold text-slate-700 bg-slate-100 rounded-xl"
+                >
+                  Connexion
+                </Link>
+                <Link
+                  href="/register"
+                  onClick={() => setMobileMenuOpen(false)}
+                  className="py-2.5 text-center text-xs font-semibold text-white bg-blue-600 rounded-xl"
+                >
+                  Inscription
+                </Link>
+              </div>
+            )}
           </div>
         </div>
       )}

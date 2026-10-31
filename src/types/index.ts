@@ -10,6 +10,18 @@ export type BookingStatus =
   | 'COMPLETED'
   | 'CANCELLED';
 
+export interface User {
+  id: string;
+  name: string;
+  email: string;
+  phone: string;
+  role: Role;
+  avatar?: string;
+  addressText?: string;
+  providerProfileId?: string; // Links to ProviderProfile if role === 'PROVIDER'
+  createdAt: string;
+}
+
 export interface Category {
   id: string;
   name: string;

@@ -1,5 +1,5 @@
-import { Category, ProviderProfile, Booking, Review, GeoSearchFilters } from '@/types';
-import { calculateHaversineDistance, DEFAULT_COORDINATES } from './geo';
+import type { Category, ProviderProfile, Booking, Review, GeoSearchFilters, User } from '../types/index.ts';
+import { calculateHaversineDistance, DEFAULT_COORDINATES } from './geo.ts';
 
 export const INITIAL_CATEGORIES: Category[] = [
   {
@@ -49,6 +49,44 @@ export const INITIAL_CATEGORIES: Category[] = [
     icon: 'Hammer',
     description: 'Meubles sur mesure, pose de cuisine, parquets et placards.',
     badgeCount: 9,
+  },
+];
+
+export const INITIAL_USERS: (User & { passwordHash: string })[] = [
+  {
+    id: 'user-client-1',
+    name: 'Sarah Belhadj',
+    email: 'client@proxiservice.com',
+    phone: '+213 550 99 88 11',
+    role: 'CLIENT',
+    addressText: 'Didouche Mourad, Alger',
+    avatar: 'https://images.unsplash.com/photo-1494790108377-be9c29b29330?auto=format&fit=crop&q=80&w=200',
+    createdAt: '2026-10-01T10:00:00.000Z',
+    passwordHash: 'password123',
+  },
+  {
+    id: 'user-karim',
+    name: 'Karim Benali',
+    email: 'karim.meca@proxiservice.com',
+    phone: '+213 550 12 34 56',
+    role: 'PROVIDER',
+    addressText: 'Bab El Oued, Alger Centre',
+    avatar: 'https://images.unsplash.com/photo-1560250097-0b93528c311a?auto=format&fit=crop&q=80&w=300',
+    providerProfileId: 'prov-karim-meca',
+    createdAt: '2026-09-15T08:30:00.000Z',
+    passwordHash: 'password123',
+  },
+  {
+    id: 'user-fatima',
+    name: 'Fatima-Zahra Cherif',
+    email: 'fatima.menage@proxiservice.com',
+    phone: '+213 661 98 76 54',
+    role: 'PROVIDER',
+    addressText: 'Kouba, Alger',
+    avatar: 'https://images.unsplash.com/photo-1573496359142-b8d87734a5a2?auto=format&fit=crop&q=80&w=300',
+    providerProfileId: 'prov-fatima-menage',
+    createdAt: '2026-09-20T09:00:00.000Z',
+    passwordHash: 'password123',
   },
 ];
 
@@ -504,10 +542,71 @@ export const INITIAL_BOOKINGS: Booking[] = [
  * In-memory state store with CRUD helpers
  */
 class DataStore {
+  private users: (User & { passwordHash: string })[] = [...INITIAL_USERS];
   private categories: Category[] = [...INITIAL_CATEGORIES];
   private providers: ProviderProfile[] = [...INITIAL_PROVIDERS];
   private bookings: Booking[] = [...INITIAL_BOOKINGS];
 
+  // User & Auth Management
+  public getUsers(): User[] {
+    return this.users.map(({ passwordHash, ...user }) => user);
+  }
+
+  public getUserByEmail(email: string): (User & { passwordHash: string }) | undefined {
+    return this.users.find((u) => u.email.toLowerCase() === email.toLowerCase());
+  }
+
+  public getUserById(id: string): User | undefined {
+    const user = this.users.find((u) => u.id === id);
+    if (!user) return undefined;
+    const { passwordHash, ...safeUser } = user;
+    return safeUser;
+  }
+
+  public registerUser(userData: {
+    name: string;
+    email: string;
+    phone: string;
+    password: string;
+    role: 'CLIENT' | 'PROVIDER';
+    addressText?: string;
+    avatar?: string;
+  }): { user: User; token: string } {
+    const existing = this.getUserByEmail(userData.email);
+    if (existing) {
+      throw new Error('Un utilisateur avec cet email existe déjà.');
+    }
+
+    const userId = `user-${Date.now()}`;
+    const newUser = {
+      id: userId,
+      name: userData.name,
+      email: userData.email,
+      phone: userData.phone,
+      role: userData.role,
+      addressText: userData.addressText || '',
+      avatar: userData.avatar || `https://api.dicebear.com/7.x/initials/svg?seed=${encodeURIComponent(userData.name)}`,
+      createdAt: new Date().toISOString(),
+      passwordHash: userData.password,
+    };
+
+    this.users.push(newUser);
+    const token = `tok_${userId}_${Date.now()}`;
+    const { passwordHash, ...safeUser } = newUser;
+    return { user: safeUser, token };
+  }
+
+  public authenticate(email: string, password: string): { user: User; token: string } | null {
+    const user = this.getUserByEmail(email);
+    if (!user || user.passwordHash !== password) {
+      return null;
+    }
+    const token = `tok_${user.id}_${Date.now()}`;
+    const { passwordHash, ...safeUser } = user;
+    return { user: safeUser, token };
+  }
+
+  // Categories
   public getCategories(): Category[] {
     return this.categories;
   }
@@ -516,12 +615,47 @@ class DataStore {
     return this.categories.find((c) => c.slug === slug);
   }
 
+  // Providers
   public getProviders(): ProviderProfile[] {
     return this.providers;
   }
 
   public getProviderById(id: string): ProviderProfile | undefined {
     return this.providers.find((p) => p.id === id);
+  }
+
+  public getProviderByUserId(userId: string): ProviderProfile | undefined {
+    return this.providers.find((p) => p.userId === userId);
+  }
+
+  public createProviderProfile(profileData: Omit<ProviderProfile, 'id' | 'ratingAverage' | 'reviewCount' | 'reviews'>): ProviderProfile {
+    const newProfile: ProviderProfile = {
+      ...profileData,
+      id: `prov-${Date.now()}`,
+      ratingAverage: 5.0,
+      reviewCount: 0,
+      reviews: [],
+    };
+    this.providers.unshift(newProfile);
+
+    // Link to user if present
+    const user = this.users.find((u) => u.id === profileData.userId);
+    if (user) {
+      user.providerProfileId = newProfile.id;
+    }
+
+    return newProfile;
+  }
+
+  public updateProvider(id: string, updates: Partial<ProviderProfile>): ProviderProfile | null {
+    const index = this.providers.findIndex((p) => p.id === id);
+    if (index === -1) return null;
+
+    this.providers[index] = {
+      ...this.providers[index],
+      ...updates,
+    };
+    return this.providers[index];
   }
 
   /**
@@ -546,12 +680,10 @@ class DataStore {
       };
     });
 
-    // 2. Spatial radius filter:
-    // A provider matches if distance is within the search radius
-    // AND within the provider's own operational radius
+    // 2. Spatial radius filter
     results = results.filter((p) => {
       const withinSearchRadius = p.distanceKm <= maxRadius;
-      const withinProviderRadius = p.distanceKm <= p.operationalRadiusKm + 5; // slight tolerance
+      const withinProviderRadius = p.distanceKm <= p.operationalRadiusKm + 5;
       return withinSearchRadius && withinProviderRadius;
     });
 
@@ -589,13 +721,14 @@ class DataStore {
       results.sort((a, b) => b.reviewCount - a.reviewCount);
     } else if (sortBy === 'price_asc') {
       const getMinPrice = (p: ProviderProfile) =>
-        Math.min(...p.services.map((s) => s.price));
+        p.services.length ? Math.min(...p.services.map((s) => s.price)) : 0;
       results.sort((a, b) => getMinPrice(a) - getMinPrice(b));
     }
 
     return results;
   }
 
+  // Bookings
   public getBookings(): Booking[] {
     return this.bookings;
   }
@@ -624,6 +757,7 @@ class DataStore {
     return booking;
   }
 
+  // Reviews
   public addReview(providerId: string, review: Omit<Review, 'id' | 'createdAt'>): Review | null {
     const provider = this.providers.find((p) => p.id === providerId);
     if (!provider) return null;
@@ -635,7 +769,6 @@ class DataStore {
     };
 
     provider.reviews.unshift(newReview);
-    // Recalculate average rating
     const total = provider.reviews.reduce((acc, r) => acc + r.rating, 0);
     provider.ratingAverage = Math.round((total / provider.reviews.length) * 100) / 100;
     provider.reviewCount = provider.reviews.length;

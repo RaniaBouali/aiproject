@@ -16,7 +16,6 @@ export async function GET(
       );
     }
 
-    // Optional: compute distance if lat/lng are supplied in query
     const { searchParams } = new URL(request.url);
     const latStr = searchParams.get('lat');
     const lngStr = searchParams.get('lng');
@@ -40,6 +39,34 @@ export async function GET(
   } catch (error) {
     return NextResponse.json(
       { success: false, error: 'Failed to fetch provider profile' },
+      { status: 500 }
+    );
+  }
+}
+
+export async function PUT(
+  request: NextRequest,
+  { params }: { params: { id: string } }
+) {
+  try {
+    const body = await request.json();
+    const updated = dataStore.updateProvider(params.id, body);
+
+    if (!updated) {
+      return NextResponse.json(
+        { success: false, error: 'Provider not found' },
+        { status: 404 }
+      );
+    }
+
+    return NextResponse.json({
+      success: true,
+      message: 'Profil prestataire mis à jour avec succès',
+      data: updated,
+    });
+  } catch (error) {
+    return NextResponse.json(
+      { success: false, error: 'Failed to update provider profile' },
       { status: 500 }
     );
   }

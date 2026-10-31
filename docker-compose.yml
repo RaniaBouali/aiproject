@@ -1,0 +1,43 @@
+version: '3.8'
+
+services:
+  # Microsoft SQL Server 2022 Container
+  sqlserver:
+    image: mcr.microsoft.com/mssql/server:2022-latest
+    container_name: proxiservice-sqlserver
+    restart: always
+    environment:
+      - ACCEPT_EULA=Y
+      - MSSQL_SA_PASSWORD=ProxiService2026!Secure
+      - MSSQL_PID=Developer
+    ports:
+      - "1433:1433"
+    volumes:
+      - mssql_data:/var/opt/mssql
+      - ./init-db.sql:/docker-entrypoint-initdb.d/init-db.sql
+    healthcheck:
+      test: ["CMD-SHELL", "/opt/mssql-tools/bin/sqlcmd -S localhost -U sa -P ProxiService2026!Secure -Q 'SELECT 1' || exit 1"]
+      interval: 10s
+      timeout: 5s
+      retries: 10
+      start_period: 15s
+
+  # Full-Stack Next.js Application
+  app:
+    build:
+      context: .
+      dockerfile: Dockerfile
+    container_name: proxiservice-web
+    restart: always
+    ports:
+      - "3000:3000"
+    environment:
+      - NODE_ENV=production
+      - DATABASE_URL=sqlserver://localhost:1433;database=ProxiServiceDB;user=sa;password=ProxiService2026!Secure;encrypt=true;trustServerCertificate=true;
+    depends_on:
+      sqlserver:
+        condition: service_healthy
+
+volumes:
+  mssql_data:
+    driver: local
