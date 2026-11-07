@@ -78,7 +78,7 @@ export async function performBookingAction(viewer: Viewer, id: string, action: S
 
 export interface NewBooking {
   providerId: string; serviceId: string; startAt: Date; address: string; lat: number; lng: number;
-  problemSummary: string; notes: string; analysisId: string;
+  problemSummary?: string; notes: string; analysisId: string;
 }
 
 /** Creates a booking after re-checking the slot inside a transaction that locks the provider row. */
@@ -107,7 +107,7 @@ export async function createBooking(client: Viewer, input: NewBooking, now = new
       clientId: client.id, providerId: service.providerId, serviceId: service.id,
       analysisId: analysis.id,
       startAt: input.startAt, endAt, address: input.address, lat: input.lat, lng: input.lng,
-      notes: input.notes, problemSummary: input.problemSummary,
+      notes: input.notes, problemSummary: analysis.summary,
       price: service.price, priceType: service.priceType, // snapshot from the DB, never from the client
     }, include: bookingInclude });
   });

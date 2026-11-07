@@ -13,11 +13,9 @@ const schema = z.object({
   lat: z.coerce.number().min(-90).max(90).default(36.8065),
   lng: z.coerce.number().min(-180).max(180).default(10.1815),
   radius: z.coerce.number().min(1).max(200).default(25),
-  category: z.string().max(80).optional(),
   minRating: z.coerce.number().min(0).max(5).optional(),
   maxPrice: z.coerce.number().min(0).optional(),
   sortBy: z.enum(['match', 'distance', 'rating', 'price_asc', 'reviews']).default('match'),
-  urgency: z.enum(['LOW', 'MEDIUM', 'HIGH']).default('LOW'),
   query: z.string().trim().max(100).optional(),
 });
 
@@ -35,7 +33,6 @@ export async function GET(request: NextRequest) {
     const status = error instanceof Error && 'status' in error ? Number((error as { status: number }).status) : 400;
     return NextResponse.json({ success: false, error: error instanceof Error ? error.message : 'Analysis is required.' }, { status });
   }
-  if (filter.category && filter.category !== analysis.categorySlug) return NextResponse.json({ success: false, error: 'Search must use the confirmed analysis category.' }, { status: 400 });
   const rows = await prisma.provider.findMany({
     where: {
       categories: { some: { category: { slug: analysis.categorySlug } } },

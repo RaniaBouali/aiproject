@@ -12,7 +12,7 @@ const createSchema = z.object({
   startAt: z.iso.datetime({ offset: true }), address: z.string().trim().min(3, 'Enter the job address.').max(255),
   lat: z.coerce.number().min(-90).max(90), lng: z.coerce.number().min(-180).max(180),
   notes: z.string().trim().max(3000).default(''),
-  problemSummary: z.string().trim().min(3, 'Describe the problem in a few words.').max(255),
+  problemSummary: z.string().trim().min(3, 'Describe the problem in a few words.').max(255).optional(),
 }).strict();
 
 /** Only the caller's own bookings: as client, or as provider. */

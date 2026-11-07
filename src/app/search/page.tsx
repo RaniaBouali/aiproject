@@ -2,7 +2,8 @@
 
 import React, { Suspense, useEffect, useState } from 'react';
 import { useSearchParams } from 'next/navigation';
-import { Crosshair, List, Map as MapIcon, MapPin, Search, SlidersHorizontal } from 'lucide-react';
+import { Crosshair, List, Map as MapIcon, MapPin, Pencil, Search, SlidersHorizontal } from 'lucide-react';
+import { useRouter } from 'next/navigation';
 import type { ProviderProfile } from '@/types';
 import ProviderCard from '@/components/ProviderCard';
 import MapComponent from '@/components/MapComponent';
@@ -14,6 +15,7 @@ type SortBy = 'match' | 'distance' | 'rating' | 'price_asc';
 
 function SearchPageContent() {
   const params = useSearchParams();
+  const router = useRouter();
   const analysisId = params.get('analysisId') || '';
   const [analysisSummary, setAnalysisSummary] = useState('');
   const [analysisUrgency, setAnalysisUrgency] = useState('LOW');
@@ -31,7 +33,7 @@ function SearchPageContent() {
 
   const loadProviders = async () => {
     setLoading(true); setError(null);
-    if (!analysisId) { setError('Complete and confirm a problem analysis first.'); setLoading(false); return; }
+    if (!analysisId) { router.replace('/client/request/new'); return; }
     const search = new URLSearchParams({ analysisId, lat: String(center.latitude), lng: String(center.longitude), radius: String(radius), sortBy });
     if (minRating) search.set('minRating', String(minRating));
     if (query.trim()) search.set('query', query.trim());
@@ -42,7 +44,14 @@ function SearchPageContent() {
       setProviders(result.data);
       setAnalysisSummary(result.meta?.analysis?.summary ?? '');
       setAnalysisUrgency(result.meta?.analysis?.urgency ?? 'LOW');
-    } catch (err) { setError(err instanceof Error ? err.message : 'Could not load providers.'); }
+    } catch (err) {
+      const message = err instanceof Error ? err.message : 'Could not load providers.';
+      if (message.toLowerCase().includes('analysis') || message.toLowerCase().includes('confirm')) {
+        router.replace(`/client/request/new${analysisId ? `?analysisId=${encodeURIComponent(analysisId)}` : ''}`);
+        return;
+      }
+      setError(message);
+    }
     finally { setLoading(false); }
   };
   useEffect(() => { void loadProviders(); }, [radius, minRating, sortBy, center]);
@@ -70,7 +79,7 @@ function SearchPageContent() {
       </form>
     </section>
 
-    {analysisSummary && <div className="mx-auto mt-5 max-w-7xl px-4"><div className="border-2 border-ink bg-mustard p-3 text-sm font-bold shadow-hard-sm"><span className="uppercase tracking-widest">Your brief:</span> {analysisSummary}</div></div>}
+    {analysisSummary && <div className="mx-auto mt-5 max-w-7xl px-4"><div className="flex flex-wrap items-center justify-between gap-3 border-2 border-ink bg-mustard p-3 text-sm font-bold shadow-hard-sm"><div><span className="uppercase tracking-widest">Confirmed brief:</span> {analysisSummary}<span className="ml-3 text-xs uppercase text-ink/65">Urgency: {analysisUrgency}</span></div><button type="button" onClick={() => router.push(`/client/request/new?analysisId=${encodeURIComponent(analysisId)}`)} className="inline-flex items-center gap-1 text-xs font-black text-teal hover:text-tomato"><Pencil className="h-3.5 w-3.5" /> Edit my problem</button></div></div>}
     <div className="mx-auto flex max-w-7xl items-center justify-center gap-1 px-4 py-3 lg:hidden"><button type="button" onClick={() => setMobileView('list')} className={mobileView === 'list' ? `${primaryButton} py-2` : `${secondaryButton} py-2`}><List className="h-4 w-4" /> List ({providers.length})</button><button type="button" onClick={() => setMobileView('map')} className={mobileView === 'map' ? `${primaryButton} py-2` : `${secondaryButton} py-2`}><MapIcon className="h-4 w-4" /> Map</button></div>
 
     <div className="mx-auto grid max-w-7xl grid-cols-1 gap-6 px-4 py-5 lg:grid-cols-12">

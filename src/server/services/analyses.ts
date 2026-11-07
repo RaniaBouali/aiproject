@@ -17,6 +17,7 @@ export async function createProblemAnalysis(viewer: Viewer, messages: ChatMessag
       urgency: result.urgency,
       summary: result.summary || 'General home service request',
       messages: messages.map((message) => chatMessageSchema.parse(message)) as unknown as Prisma.InputJsonValue,
+      expiresAt: new Date(Date.now() + 24 * 60 * 60 * 1000),
     },
   });
   return { id: analysis.id, result };
@@ -29,8 +30,23 @@ export async function confirmProblemAnalysis(viewer: Viewer, id: string) {
   if (analysis.status === 'EXPIRED') throw new ServiceError(400, 'This analysis has expired. Start a new request.');
   return prisma.problemAnalysis.update({
     where: { id },
-    data: { status: 'CONFIRMED', confirmedAt: new Date() },
+    data: { status: 'CONFIRMED', confirmedAt: new Date(), expiresAt: new Date(Date.now() + 24 * 60 * 60 * 1000) },
   });
+}
+
+export async function getProblemAnalysis(viewer: Viewer, id: string) {
+  if (viewer.role !== 'CLIENT') throw new ServiceError(403, 'Only clients can access service analyses.');
+  const analysis = await prisma.problemAnalysis.findUnique({ where: { id } });
+  if (!analysis || analysis.clientId !== viewer.id) throw new ServiceError(404, 'Analysis not found.');
+  return {
+    id: analysis.id,
+    status: analysis.status,
+    categorySlug: analysis.categorySlug,
+    urgency: analysis.urgency,
+    summary: analysis.summary,
+    messages: analysis.messages,
+    expiresAt: analysis.expiresAt,
+  };
 }
 
 export async function getConfirmedAnalysis(viewer: Viewer, id: string) {

@@ -24,7 +24,8 @@ export function classifyProblem(messages: ChatMessage[], forceReady = false): AI
   const ranked = CATEGORY_SLUGS.map((category) => ({ category, score: words[category].filter((word) => normalized.includes(normalize(word))).length })).sort((a, b) => b.score - a.score);
   const categorySlug = ranked[0].score ? ranked[0].category : null;
   const urgency = /(fire|smoke|spark|gas|flood|danger|urgent|immediate|incendie|fumee|etincelle|gaz|inondation|urgence|خطر|حريق|دخان|غاز|فيضان)/i.test(normalized) ? 'HIGH' : /(today|tonight|now|asap|aujourd|maintenant|vite|tawa|اليوم|توا)/i.test(normalized) ? 'MEDIUM' : 'LOW';
-  if (categorySlug || forceReady || messages.filter((message) => message.role === 'assistant').length >= 2) return { reply: 'I have enough to find the right local help.', status: 'ready', categorySlug: categorySlug ?? 'cleaning', urgency, summary: text.slice(0, 255) || 'General home service request' };
+  if (categorySlug) return { reply: 'I have enough to find the right local help.', status: 'ready', categorySlug, urgency, summary: text.slice(0, 255) };
+  if (forceReady) return { reply: 'I could not identify the right service yet. Please edit your description and mention the item or trade involved.', status: 'need_more', categorySlug: null, urgency, summary: text.slice(0, 255) };
   const question = messages.filter((m) => m.role === 'assistant').length === 0 ? 'What needs attention, and where is it located?' : 'Is it a vehicle, water, electrical, cleaning, painting, or woodwork problem?';
   return { reply: question, status: 'need_more', categorySlug: null, urgency, summary: text.slice(0, 255) };
 }

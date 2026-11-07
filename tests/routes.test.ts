@@ -36,6 +36,7 @@ import { PUT as updateProvider } from '@/app/api/providers/[id]/route';
 import { GET as getSlots } from '@/app/api/providers/[id]/slots/route';
 import { PUT as putAvailability } from '@/app/api/providers/[id]/availability/route';
 import { POST as createReview } from '@/app/api/reviews/route';
+import { GET as getAnalysis } from '@/app/api/analyses/[id]/route';
 
 const client = { id: 'client_1', name: 'Client One', email: 'client@example.tn', phone: '+216 20 000 001', role: 'CLIENT', lat: 36.8, lng: 10.1, addressLabel: 'Tunis' };
 const otherClient = { ...client, id: 'client_2', email: 'other@example.tn' };
@@ -82,7 +83,7 @@ beforeEach(() => {
   db.review.aggregate.mockResolvedValue({ _avg: { rating: 4 }, _count: { _all: 3 } });
   db.availability.findMany.mockResolvedValue(HOURS);
   db.booking.findMany.mockResolvedValue([]);
-  db.problemAnalysis.findUnique.mockResolvedValue({ id: 'analysis_1', clientId: client.id, status: 'CONFIRMED', categorySlug: 'plumber', expiresAt: null });
+  db.problemAnalysis.findUnique.mockResolvedValue({ id: 'analysis_1', clientId: client.id, status: 'CONFIRMED', categorySlug: 'plumber', urgency: 'MEDIUM', summary: 'Confirmed leak under the kitchen sink.', messages: [], expiresAt: null });
   db.booking.updateMany.mockResolvedValue({ count: 1 });
 });
 
@@ -92,6 +93,25 @@ describe('auth', () => {
     expect(response.status).toBe(200);
     expect(response.cookies.get('proxiservice_session')?.httpOnly).toBe(true);
     expect(JSON.stringify(await response.json())).not.toMatch(/token|passwordHash/);
+  });
+
+  describe('GET /api/analyses/[id]', () => {
+    it('returns an owned analysis for reopening/editing', async () => {
+      db.problemAnalysis.findUnique.mockResolvedValue({
+        id: 'analysis_1', clientId: client.id, status: 'CONFIRMED', categorySlug: 'plumber',
+        urgency: 'MEDIUM', summary: 'Confirmed leak under the kitchen sink.', messages: [{ role: 'user', content: 'sink leak' }],
+        expiresAt: null,
+      });
+      const response = await getAnalysis(await call('/api/analyses/analysis_1', { as: client }), ctx('analysis_1'));
+      expect(response.status).toBe(200);
+      expect((await response.json()).data.id).toBe('analysis_1');
+    });
+
+    it('does not expose another client\'s analysis', async () => {
+      db.problemAnalysis.findUnique.mockResolvedValue({ id: 'analysis_1', clientId: otherClient.id, status: 'CONFIRMED' });
+      const response = await getAnalysis(await call('/api/analyses/analysis_1', { as: client }), ctx('analysis_1'));
+      expect(response.status).toBe(404);
+    });
   });
 
   it('rejects a wrong password with 401 and no cookie', async () => {
@@ -178,6 +198,7 @@ describe('POST /api/bookings', () => {
     expect(data.priceType).toBe('HOURLY');
     expect(data.clientId).toBe(client.id);
     expect(data.endAt.getTime() - data.startAt.getTime()).toBe(60 * 60_000);
+    expect(data.problemSummary).toBe('Confirmed leak under the kitchen sink.');
   });
 
   it('returns 409 when the slot was taken in the meantime (double booking)', async () => {

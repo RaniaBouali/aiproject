@@ -13,8 +13,9 @@ describe('keyword problem classifier', () => {
     expect(result.categorySlug).toBe(category);
   });
 
-  it('asks no more than two follow-up questions', () => {
+  it('does not invent a category after two follow-up questions', () => {
     const messages = [{ role: 'user' as const, content: 'I need help' }, { role: 'assistant' as const, content: 'What happened?' }, { role: 'user' as const, content: 'It is in my home' }, { role: 'assistant' as const, content: 'Which trade?' }];
-    expect(classifyProblem(messages).status).toBe('ready');
+    expect(classifyProblem(messages).status).toBe('need_more');
+    expect(classifyProblem(messages).categorySlug).toBeNull();
   });
 });
