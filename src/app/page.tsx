@@ -10,14 +10,16 @@ import {
   Wrench, 
   Sparkles, 
   Zap, 
-  Droplet, 
+  Droplets, 
   Paintbrush, 
   Hammer, 
   ShieldCheck, 
   Star, 
   Clock, 
-  CheckCircle,
-  ArrowRight
+  ArrowRight,
+  CheckCircle2,
+  SlidersHorizontal,
+  Compass
 } from 'lucide-react';
 import { INITIAL_CATEGORIES, INITIAL_PROVIDERS } from '@/lib/data-store';
 import ProviderCard from '@/components/ProviderCard';
@@ -38,23 +40,23 @@ export default function HomePage() {
     setSession(getStoredSession());
   }, []);
 
-  // Quick category icons mapper
+  // Purposeful trade icons
   const getCategoryIcon = (slug: string) => {
     switch (slug) {
       case 'mecanicien':
-        return <Wrench className="w-6 h-6 text-blue-600" />;
+        return <Wrench className="w-5 h-5 text-amber-700" />;
       case 'femme-de-menage':
-        return <Sparkles className="w-6 h-6 text-pink-600" />;
+        return <Sparkles className="w-5 h-5 text-amber-700" />;
       case 'electricien':
-        return <Zap className="w-6 h-6 text-amber-600" />;
+        return <Zap className="w-5 h-5 text-amber-700" />;
       case 'plombier':
-        return <Droplet className="w-6 h-6 text-cyan-600" />;
+        return <Droplets className="w-5 h-5 text-amber-700" />;
       case 'peintre':
-        return <Paintbrush className="w-6 h-6 text-emerald-600" />;
+        return <Paintbrush className="w-5 h-5 text-amber-700" />;
       case 'menuisier':
-        return <Hammer className="w-6 h-6 text-orange-600" />;
+        return <Hammer className="w-5 h-5 text-amber-700" />;
       default:
-        return <Wrench className="w-6 h-6 text-blue-600" />;
+        return <Wrench className="w-5 h-5 text-amber-700" />;
     }
   };
 
@@ -76,7 +78,6 @@ export default function HomePage() {
       (err) => {
         console.warn('Geolocation denied or failed, using defaults', err);
         setIsLocating(false);
-        // Default to Algiers center
         setUserCoords({ lat: 36.7538, lng: 3.0588 });
       }
     );
@@ -95,70 +96,71 @@ export default function HomePage() {
   };
 
   return (
-    <div className="flex flex-col min-h-screen">
-      {/* Hero Section */}
-      <section className="relative overflow-hidden bg-gradient-to-b from-blue-900 via-indigo-900 to-slate-900 text-white pt-20 pb-28 px-4 sm:px-6 lg:px-8">
-        {/* Ambient glow backgrounds */}
-        <div className="absolute top-0 left-1/2 -translate-x-1/2 w-full max-w-7xl h-96 bg-blue-500/15 blur-[120px] pointer-events-none rounded-full" />
+    <div className="flex flex-col min-h-screen bg-[#F9F9F7]">
+      {/* Editorial Workbench Hero */}
+      <section className="relative bg-slate-950 text-white border-b border-stone-800">
+        <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 pt-14 pb-16">
+          <div className="max-w-3xl space-y-5">
+            {/* Trust badge */}
+            <div className="inline-flex items-center gap-2 px-2.5 py-1 rounded bg-slate-900 border border-slate-800 text-slate-300 text-xs font-mono">
+              <ShieldCheck className="w-3.5 h-3.5 text-emerald-400" />
+              <span>Réseau d&apos;artisans certifiés et vérifiés à l&apos;adresse</span>
+            </div>
 
-        <div className="relative max-w-5xl mx-auto text-center space-y-6">
-          <div className="inline-flex items-center gap-2 px-3 py-1.5 rounded-full bg-white/10 backdrop-blur-md border border-white/15 text-blue-200 text-xs font-semibold uppercase tracking-wider">
-            <ShieldCheck className="w-4 h-4 text-emerald-400" />
-            <span>Artisans & Professionnels vérifiés de proximité</span>
+            <h1 className="text-3xl sm:text-4xl lg:text-5xl font-bold tracking-tight text-white leading-tight font-display">
+              Trouvez l&apos;artisan compétent qui intervient dans votre quartier.
+            </h1>
+
+            <p className="text-sm sm:text-base text-slate-400 font-normal leading-relaxed max-w-2xl font-sans">
+              Mécanique mobile, plomberie d&apos;urgence, électricité, travaux et services à domicile. Tarifs fixes en Dinars Algériens, avis clients authentifiés et mise en relation directe.
+            </p>
           </div>
 
-          <h1 className="text-4xl sm:text-5xl lg:text-6xl font-extrabold tracking-tight leading-tight text-white">
-            Besoin d'un <span className="text-transparent bg-clip-text bg-gradient-to-r from-blue-400 via-sky-300 to-teal-300">mécanicien</span>, d'une <span className="text-transparent bg-clip-text bg-gradient-to-r from-pink-400 to-rose-300">femme de ménage</span> ou d'un artisan près de chez vous ?
-          </h1>
-
-          <p className="max-w-2xl mx-auto text-base sm:text-lg text-slate-300 font-light">
-            Découvrez instantanément les professionnels disponibles dans votre quartier. Consultez leurs profils complets, avis vérifiés, tarifs transparents et réservez en direct.
-          </p>
-
-          {/* Search Box Card */}
-          <div className="pt-4 max-w-4xl mx-auto space-y-4">
-            {session?.user.role === 'PROVIDER' && (
-              <div className="p-4 bg-amber-500/20 border border-amber-400/40 rounded-2xl backdrop-blur-md flex flex-col sm:flex-row items-center justify-between gap-3 text-left">
-                <div className="flex items-center gap-3">
-                  <div className="p-2 rounded-xl bg-amber-500 text-white shrink-0">
-                    <Wrench className="w-5 h-5" />
-                  </div>
-                  <div>
-                    <h4 className="text-xs sm:text-sm font-bold text-white">
-                      Vous êtes connecté en tant que prestataire ({session.user.name})
-                    </h4>
-                    <p className="text-[11px] text-amber-200">
-                      Gérez vos interventions, modifiez vos tarifs et consultez vos demandes en attente.
-                    </p>
-                  </div>
+          {/* Provider Cockpit Jump (If logged in as provider) */}
+          {session?.user.role === 'PROVIDER' && (
+            <div className="mt-8 p-3.5 bg-slate-900/90 border border-amber-600/40 rounded-lg flex flex-col sm:flex-row items-center justify-between gap-3 text-left">
+              <div className="flex items-center gap-3">
+                <div className="p-2 rounded bg-amber-600 text-slate-950 font-bold shrink-0">
+                  <Wrench className="w-4 h-4" />
                 </div>
-                <Link
-                  href="/provider/dashboard"
-                  className="shrink-0 px-4 py-2 bg-amber-500 hover:bg-amber-600 text-white font-bold text-xs rounded-xl shadow-md transition flex items-center gap-1.5"
-                >
-                  <span>Mon Cockpit Pro</span>
-                  <ArrowRight className="w-3.5 h-3.5" />
-                </Link>
+                <div>
+                  <h4 className="text-xs sm:text-sm font-bold text-white">
+                    Session Artisan active &mdash; {session.user.name}
+                  </h4>
+                  <p className="text-xs text-slate-400">
+                    Accédez directement à vos demandes d&apos;intervention en attente et à votre grille tarifaire.
+                  </p>
+                </div>
               </div>
-            )}
+              <Link
+                href="/provider/dashboard"
+                className="shrink-0 px-3.5 py-1.5 bg-amber-600 hover:bg-amber-500 text-slate-950 font-bold text-xs rounded transition flex items-center gap-1.5"
+              >
+                <span>Mon Cockpit Pro</span>
+                <ArrowRight className="w-3.5 h-3.5" />
+              </Link>
+            </div>
+          )}
 
+          {/* Search Workbench */}
+          <div className="mt-8">
             <form
               onSubmit={handleSearchSubmit}
-              className="bg-white text-slate-800 p-4 sm:p-5 rounded-3xl shadow-2xl border border-white/20 backdrop-blur-lg flex flex-col md:flex-row items-stretch gap-3 text-left"
+              className="bg-white text-slate-900 p-2 sm:p-2.5 rounded-lg border border-stone-300 shadow-elevated flex flex-col md:flex-row items-stretch gap-2"
             >
               {/* Category selector */}
-              <div className="flex-1 min-w-[200px] border-b md:border-b-0 md:border-r border-slate-200 pb-3 md:pb-0 md:pr-4">
-                <label className="block text-[11px] font-bold uppercase tracking-wider text-slate-500 mb-1">
-                  Quel service recherchez-vous ?
+              <div className="flex-1 min-w-[220px] px-3 py-2 border-b md:border-b-0 md:border-r border-stone-200">
+                <label className="block text-[10px] font-mono uppercase tracking-wider text-slate-500 font-bold mb-1">
+                  1. Métier / Prestation
                 </label>
                 <div className="flex items-center gap-2">
-                  <Search className="w-4 h-4 text-blue-600 shrink-0" />
+                  <Search className="w-4 h-4 text-amber-700 shrink-0" />
                   <select
                     value={selectedCategory}
                     onChange={(e) => setSelectedCategory(e.target.value)}
-                    className="w-full bg-transparent font-medium text-slate-900 text-sm focus:outline-none cursor-pointer"
+                    className="w-full bg-transparent font-semibold text-slate-900 text-xs focus:outline-none cursor-pointer"
                   >
-                    <option value="all">Toutes les spécialités</option>
+                    <option value="all">Tous les corps d&apos;état</option>
                     {INITIAL_CATEGORIES.map((cat) => (
                       <option key={cat.id} value={cat.slug}>
                         {cat.name}
@@ -169,34 +171,34 @@ export default function HomePage() {
               </div>
 
               {/* Location & GPS */}
-              <div className="flex-1 min-w-[200px] border-b md:border-b-0 md:border-r border-slate-200 pb-3 md:pb-0 md:pr-4">
-                <label className="block text-[11px] font-bold uppercase tracking-wider text-slate-500 mb-1">
-                  Localisation
+              <div className="flex-1 min-w-[220px] px-3 py-2 border-b md:border-b-0 md:border-r border-stone-200">
+                <label className="block text-[10px] font-mono uppercase tracking-wider text-slate-500 font-bold mb-1">
+                  2. Secteur d&apos;intervention
                 </label>
                 <div className="flex items-center justify-between gap-2">
                   <div className="flex items-center gap-2 overflow-hidden">
-                    <MapPin className="w-4 h-4 text-emerald-600 shrink-0" />
-                    <span className="text-sm font-medium text-slate-800 truncate">
-                      {userCoords ? 'Position GPS détectée' : 'Alger Centre (par défaut)'}
+                    <MapPin className="w-4 h-4 text-emerald-700 shrink-0" />
+                    <span className="text-xs font-semibold text-slate-800 truncate">
+                      {userCoords ? 'Coordonnées GPS actives' : 'Alger Centre (par défaut)'}
                     </span>
                   </div>
                   <button
                     type="button"
                     onClick={handleAutoLocate}
-                    title="Me géolocaliser automatiquement"
-                    className="px-2 py-1 text-xs font-semibold text-blue-600 hover:text-blue-800 hover:bg-blue-50 rounded-lg flex items-center gap-1 shrink-0 transition"
+                    title="Détecter ma position exacte"
+                    className="px-2 py-0.5 text-[11px] font-semibold text-slate-700 hover:text-slate-950 bg-stone-100 hover:bg-stone-200 rounded border border-stone-200 flex items-center gap-1 shrink-0 transition"
                   >
-                    <Crosshair className={`w-3.5 h-3.5 ${isLocating ? 'animate-spin' : ''}`} />
-                    <span>{isLocating ? 'Localisation...' : 'GPS'}</span>
+                    <Crosshair className={`w-3 h-3 ${isLocating ? 'animate-spin' : ''}`} />
+                    <span>{isLocating ? 'Scan...' : 'GPS'}</span>
                   </button>
                 </div>
               </div>
 
               {/* Radius slider */}
-              <div className="w-full md:w-44 border-b md:border-b-0 md:border-r border-slate-200 pb-3 md:pb-0 md:pr-4">
-                <div className="flex justify-between text-[11px] font-bold uppercase tracking-wider text-slate-500 mb-1">
+              <div className="w-full md:w-44 px-3 py-2 border-b md:border-b-0 md:border-r border-stone-200">
+                <div className="flex justify-between text-[10px] font-mono uppercase tracking-wider text-slate-500 font-bold mb-1">
                   <span>Rayon</span>
-                  <span className="text-blue-600 font-bold">{searchRadius} km</span>
+                  <span className="text-slate-900 font-bold tabular-nums">{searchRadius} km</span>
                 </div>
                 <input
                   type="range"
@@ -205,54 +207,79 @@ export default function HomePage() {
                   step="1"
                   value={searchRadius}
                   onChange={(e) => setSearchRadius(Number(e.target.value))}
-                  className="w-full accent-blue-600 cursor-pointer h-1.5 bg-slate-200 rounded-lg"
+                  className="w-full accent-amber-600 cursor-pointer h-1.5 bg-stone-200 rounded"
                 />
               </div>
 
-              {/* Submit button */}
+              {/* Action */}
               <button
                 type="submit"
-                className="w-full md:w-auto px-7 py-3.5 bg-blue-600 hover:bg-blue-700 active:scale-95 text-white font-bold rounded-2xl shadow-lg shadow-blue-600/30 flex items-center justify-center gap-2 transition"
+                className="px-6 py-2.5 bg-slate-950 hover:bg-slate-900 active:bg-slate-950 text-white font-semibold text-xs rounded-md shadow-subtle flex items-center justify-center gap-2 transition"
               >
-                <Search className="w-4 h-4" />
-                <span>Trouver</span>
+                <Search className="w-3.5 h-3.5 text-amber-400" />
+                <span>Rechercher</span>
               </button>
             </form>
+          </div>
+
+          {/* Quick stats strip */}
+          <div className="mt-8 pt-6 border-t border-slate-900 grid grid-cols-2 sm:grid-cols-4 gap-4 text-xs font-mono text-slate-400">
+            <div>
+              <span className="block text-slate-200 font-bold text-base tabular-nums">100%</span>
+              <span>Identités vérifiées</span>
+            </div>
+            <div>
+              <span className="block text-slate-200 font-bold text-base tabular-nums">0 DZD</span>
+              <span>Frais pour le particulier</span>
+            </div>
+            <div>
+              <span className="block text-slate-200 font-bold text-base tabular-nums">&lt; 15 min</span>
+              <span>Temps de réponse moyen</span>
+            </div>
+            <div>
+              <span className="block text-slate-200 font-bold text-base tabular-nums">4.9 / 5</span>
+              <span>Satisfaction globale</span>
+            </div>
           </div>
         </div>
       </section>
 
-      {/* Popular Categories Grid */}
-      <section id="categories" className="py-16 px-4 sm:px-6 lg:px-8 max-w-7xl mx-auto w-full">
-        <div className="text-center max-w-2xl mx-auto mb-12">
-          <h2 className="text-2xl sm:text-3xl font-extrabold text-slate-900 tracking-tight">
-            Explorez les métiers par catégorie
-          </h2>
-          <p className="text-slate-500 text-sm mt-2">
-            Des spécialistes qualifiés prêts à intervenir à votre domicile ou sur votre lieu de travail.
+      {/* Trade Categories Directory */}
+      <section id="categories" className="py-14 px-4 sm:px-6 lg:px-8 max-w-7xl mx-auto w-full">
+        <div className="flex flex-col sm:flex-row sm:items-end justify-between gap-4 mb-8">
+          <div>
+            <span className="text-[10px] font-mono uppercase tracking-wider text-slate-500 font-bold">
+              Spécialités professionnelles
+            </span>
+            <h2 className="text-xl sm:text-2xl font-bold text-slate-950 tracking-tight font-display mt-0.5">
+              Sélectionnez un corps de métier
+            </h2>
+          </div>
+          <p className="text-xs text-slate-600 max-w-md">
+            Chaque artisan dispose d&apos;une fiche technique complète avec zone d&apos;intervention et grille tarifaire.
           </p>
         </div>
 
-        <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-6">
+        <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-4">
           {INITIAL_CATEGORIES.map((cat) => (
             <Link
               key={cat.id}
               href={`/search?category=${cat.slug}`}
-              className="group p-6 bg-white rounded-2xl border border-slate-200/80 hover:border-blue-400 hover:shadow-xl transition-all duration-300 flex items-start gap-4"
+              className="group p-4 bg-white rounded-lg border border-stone-200/90 hover:border-stone-400 shadow-card hover:shadow-elevated transition-all flex items-start gap-3.5"
             >
-              <div className="p-3.5 rounded-2xl bg-slate-50 group-hover:bg-blue-50 border border-slate-100 group-hover:border-blue-100 transition-colors shrink-0">
+              <div className="p-2.5 rounded bg-stone-100 group-hover:bg-amber-50 border border-stone-200 group-hover:border-amber-200 transition-colors shrink-0">
                 {getCategoryIcon(cat.slug)}
               </div>
               <div className="flex-1 min-w-0">
                 <div className="flex items-center justify-between mb-1">
-                  <h3 className="font-bold text-slate-900 group-hover:text-blue-600 transition-colors text-base truncate">
+                  <h3 className="font-bold text-slate-950 group-hover:text-amber-800 transition-colors text-sm truncate font-display">
                     {cat.name}
                   </h3>
-                  <span className="text-xs font-semibold px-2 py-0.5 rounded-full bg-slate-100 text-slate-600 group-hover:bg-blue-100 group-hover:text-blue-700">
+                  <span className="text-[11px] font-mono px-1.5 py-0.5 rounded bg-stone-100 text-slate-700 border border-stone-200 group-hover:border-stone-300">
                     {cat.badgeCount} pros
                   </span>
                 </div>
-                <p className="text-xs text-slate-500 line-clamp-2 leading-relaxed">
+                <p className="text-xs text-slate-600 line-clamp-2 leading-relaxed">
                   {cat.description}
                 </p>
               </div>
@@ -261,29 +288,29 @@ export default function HomePage() {
         </div>
       </section>
 
-      {/* Featured Verified Providers */}
-      <section className="py-16 bg-slate-100/60 border-y border-slate-200/60 px-4 sm:px-6 lg:px-8">
+      {/* Featured Verified Artisans */}
+      <section className="py-14 bg-stone-100/70 border-y border-stone-200/80 px-4 sm:px-6 lg:px-8">
         <div className="max-w-7xl mx-auto">
-          <div className="flex flex-col sm:flex-row items-start sm:items-end justify-between gap-4 mb-10">
+          <div className="flex flex-col sm:flex-row items-start sm:items-end justify-between gap-4 mb-8">
             <div>
-              <div className="inline-flex items-center gap-1.5 text-xs font-bold text-blue-600 uppercase tracking-wider mb-1">
-                <Star className="w-4 h-4 fill-amber-400 text-amber-400" />
-                <span>Les mieux notés</span>
+              <div className="inline-flex items-center gap-1.5 text-[11px] font-mono uppercase font-bold text-amber-800 mb-1">
+                <Star className="w-3.5 h-3.5 fill-amber-500 text-amber-500" />
+                <span>Recommandés par les clients</span>
               </div>
-              <h2 className="text-2xl sm:text-3xl font-extrabold text-slate-900">
-                Artisans recommandés autour de vous
+              <h2 className="text-xl sm:text-2xl font-bold text-slate-950 font-display">
+                Artisans prêts à intervenir dans le secteur
               </h2>
             </div>
             <Link
               href="/search"
-              className="inline-flex items-center gap-1 text-sm font-semibold text-blue-600 hover:text-blue-700 hover:underline"
+              className="inline-flex items-center gap-1 text-xs font-semibold text-slate-900 hover:text-amber-800 hover:underline"
             >
-              <span>Voir tous les artisans sur la carte</span>
-              <ArrowRight className="w-4 h-4" />
+              <span>Consulter la carte complète</span>
+              <ArrowRight className="w-3.5 h-3.5" />
             </Link>
           </div>
 
-          <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
+          <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
             {INITIAL_PROVIDERS.slice(0, 4).map((provider) => (
               <ProviderCard
                 key={provider.id}
@@ -295,70 +322,75 @@ export default function HomePage() {
         </div>
       </section>
 
-      {/* How It Works */}
-      <section className="py-20 px-4 sm:px-6 lg:px-8 max-w-7xl mx-auto w-full">
-        <div className="text-center max-w-2xl mx-auto mb-16">
-          <span className="text-xs font-bold uppercase tracking-wider text-blue-600">
-            Simple & Transparent
+      {/* How It Works: Architectural Step Blueprint */}
+      <section className="py-16 px-4 sm:px-6 lg:px-8 max-w-7xl mx-auto w-full">
+        <div className="max-w-xl mb-12">
+          <span className="text-[10px] font-mono uppercase tracking-wider text-slate-500 font-bold">
+            Méthodologie ProxiService
           </span>
-          <h2 className="text-2xl sm:text-3xl font-extrabold text-slate-900 tracking-tight mt-1">
-            Comment fonctionne ProxiService ?
+          <h2 className="text-xl sm:text-2xl font-bold text-slate-950 tracking-tight font-display mt-0.5">
+            Processus d&apos;intervention en 3 étapes
           </h2>
+          <p className="text-xs text-slate-600 mt-1">
+            Une mise en relation directe, sans intermédiaires inutiles ni commissions occultes.
+          </p>
         </div>
 
-        <div className="grid grid-cols-1 md:grid-cols-3 gap-8">
-          <div className="p-8 bg-white rounded-3xl border border-slate-200/80 shadow-sm text-center space-y-4">
-            <div className="w-14 h-14 rounded-2xl bg-blue-50 text-blue-600 font-extrabold text-xl flex items-center justify-center mx-auto border border-blue-100 shadow-inner">
-              1
+        <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
+          <div className="p-5 bg-white rounded-lg border border-stone-200/90 shadow-card space-y-3">
+            <div className="w-8 h-8 rounded bg-slate-950 text-amber-400 font-mono font-bold text-sm flex items-center justify-center">
+              01
             </div>
-            <h3 className="text-lg font-bold text-slate-900">Localisez à proximité</h3>
-            <p className="text-sm text-slate-500 leading-relaxed">
-              Activez votre GPS ou indiquez votre quartier. Notre moteur spatial PostGIS calcule les artisans les plus proches de vous en temps réel.
+            <h3 className="text-sm font-bold text-slate-950 font-display">Localisation du périmètre</h3>
+            <p className="text-xs text-slate-600 leading-relaxed">
+              Définissez votre adresse ou activez le GPS. Notre algorithme géodésique Haversine calcule en direct les artisans situés dans votre rayon kilométrique.
             </p>
           </div>
 
-          <div className="p-8 bg-white rounded-3xl border border-slate-200/80 shadow-sm text-center space-y-4">
-            <div className="w-14 h-14 rounded-2xl bg-indigo-50 text-indigo-600 font-extrabold text-xl flex items-center justify-center mx-auto border border-indigo-100 shadow-inner">
-              2
+          <div className="p-5 bg-white rounded-lg border border-stone-200/90 shadow-card space-y-3">
+            <div className="w-8 h-8 rounded bg-slate-950 text-amber-400 font-mono font-bold text-sm flex items-center justify-center">
+              02
             </div>
-            <h3 className="text-lg font-bold text-slate-900">Consultez les profils & tarifs</h3>
-            <p className="text-sm text-slate-500 leading-relaxed">
-              Photos de réalisations antérieures, tarifs fixes ou horaires détaillés et évaluations 100% certifiées laissées par de vrais clients.
+            <h3 className="text-sm font-bold text-slate-950 font-display">Consultation de la grille tarifaire</h3>
+            <p className="text-xs text-slate-600 leading-relaxed">
+              Vérifiez les tarifs déclarés à l&apos;avance (au forfait ou à l&apos;heure), les antécédents professionnels et les avis vérifiés des précédents clients.
             </p>
           </div>
 
-          <div className="p-8 bg-white rounded-3xl border border-slate-200/80 shadow-sm text-center space-y-4">
-            <div className="w-14 h-14 rounded-2xl bg-emerald-50 text-emerald-600 font-extrabold text-xl flex items-center justify-center mx-auto border border-emerald-100 shadow-inner">
-              3
+          <div className="p-5 bg-white rounded-lg border border-stone-200/90 shadow-card space-y-3">
+            <div className="w-8 h-8 rounded bg-slate-950 text-amber-400 font-mono font-bold text-sm flex items-center justify-center">
+              03
             </div>
-            <h3 className="text-lg font-bold text-slate-900">Prenez rendez-vous en direct</h3>
-            <p className="text-sm text-slate-500 leading-relaxed">
-              Choisissez votre créneau et vos besoins. L’artisan reçoit votre demande instantanément et confirme son intervention sans commission abusive.
+            <h3 className="text-sm font-bold text-slate-950 font-display">Demande & Intervention directe</h3>
+            <p className="text-xs text-slate-600 leading-relaxed">
+              Sélectionnez la date, transmettez vos coordonnées et le descriptif du besoin. L&apos;artisan prend directement contact pour valider l&apos;intervention.
             </p>
           </div>
         </div>
       </section>
 
-      {/* Pro CTA Banner */}
-      <section className="bg-slate-900 text-white py-16 px-4 sm:px-6 lg:px-8 border-t border-slate-800">
-        <div className="max-w-5xl mx-auto rounded-3xl bg-gradient-to-r from-blue-700 via-indigo-700 to-blue-800 p-8 sm:p-12 shadow-2xl flex flex-col md:flex-row items-center justify-between gap-8">
-          <div className="space-y-3 text-center md:text-left">
-            <span className="px-3 py-1 rounded-full bg-white/20 text-white text-xs font-semibold uppercase tracking-wider">
-              Vous êtes artisan ou prestataire ?
-            </span>
-            <h3 className="text-2xl sm:text-3xl font-extrabold text-white">
-              Développez votre clientèle locale dès aujourd'hui
+      {/* Pro Registration Callout */}
+      <section className="bg-slate-950 text-white py-14 px-4 sm:px-6 lg:px-8 border-t border-stone-800">
+        <div className="max-w-5xl mx-auto rounded-lg bg-slate-900 border border-stone-800 p-6 sm:p-8 flex flex-col md:flex-row items-center justify-between gap-6">
+          <div className="space-y-2 text-left">
+            <div className="inline-flex items-center gap-1.5 text-[10px] font-mono text-amber-400 uppercase font-bold">
+              <Wrench className="w-3.5 h-3.5" />
+              <span>Espace Prestataires & Artisans</span>
+            </div>
+            <h3 className="text-lg sm:text-xl font-bold text-white font-display">
+              Vous exercez un métier de terrain ? Rejoignez le réseau ProxiService.
             </h3>
-            <p className="text-blue-100 text-sm max-w-xl">
-              Créez votre vitrine professionnelle, définissez votre zone de chalandise kilométrique et recevez directement les demandes des particuliers de votre secteur.
+            <p className="text-xs text-slate-400 max-w-xl leading-relaxed">
+              Recevez des demandes d&apos;intervention qualifiées dans votre secteur d&apos;activité sans commission abusive sur vos prestations.
             </p>
           </div>
 
           <Link
-            href="/provider/dashboard"
-            className="shrink-0 px-8 py-4 bg-white text-blue-700 hover:bg-blue-50 font-bold rounded-2xl shadow-xl transition-transform active:scale-95"
+            href="/register?role=provider"
+            className="shrink-0 px-5 py-2.5 bg-amber-600 hover:bg-amber-500 text-slate-950 font-bold text-xs rounded transition flex items-center gap-1.5 shadow-subtle"
           >
-            Accéder à l'espace Pro
+            <span>Créer ma fiche Artisan</span>
+            <ArrowRight className="w-3.5 h-3.5" />
           </Link>
         </div>
       </section>

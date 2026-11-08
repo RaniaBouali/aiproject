@@ -5,37 +5,74 @@
 @import "leaflet/dist/leaflet.css";
 
 :root {
-  --background: #f8fafc;
-  --foreground: #0f172a;
+  --background: #F9F9F7;
+  --foreground: #0F172A;
+  --surface: #FFFFFF;
+  --border: #E2E8F0;
+  --brand-navy: #0F172A;
+  --brand-ochre: #D97706;
+  --brand-forest: #15803D;
 }
 
 body {
   color: var(--foreground);
   background: var(--background);
-  font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Helvetica, Arial, sans-serif;
+  font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, "Helvetica Neue", Arial, sans-serif;
   -webkit-font-smoothing: antialiased;
+  -moz-osx-font-smoothing: grayscale;
 }
 
-/* Custom leaflet map fixes */
+/* Number typography for transparent pricing & metrics */
+.tabular-nums {
+  font-variant-numeric: tabular-nums;
+}
+
+/* Leaflet map custom architectural styling */
 .leaflet-container {
   width: 100%;
   height: 100%;
-  border-radius: 0.75rem;
+  border-radius: 10px;
   z-index: 10;
+  font-family: inherit;
 }
 
 .leaflet-popup-content-wrapper {
-  border-radius: 0.75rem !important;
-  padding: 4px !important;
-  box-shadow: 0 10px 25px -5px rgba(0, 0, 0, 0.1), 0 8px 10px -6px rgba(0, 0, 0, 0.1) !important;
+  border-radius: 10px !important;
+  padding: 0 !important;
+  overflow: hidden;
+  box-shadow: 0 10px 25px -5px rgba(15, 23, 42, 0.15), 0 4px 6px -2px rgba(15, 23, 42, 0.05) !important;
+  border: 1px solid #E2E8F0 !important;
 }
 
 .leaflet-popup-content {
-  margin: 8px 12px !important;
+  margin: 12px 14px !important;
   line-height: 1.4 !important;
 }
 
-/* Smooth animations */
-.transition-smooth {
-  transition: all 0.25s cubic-bezier(0.16, 1, 0.3, 1);
+.leaflet-popup-tip-container {
+  display: none !important;
+}
+
+/* Subtle architectural divider line */
+.craft-divider {
+  border-color: #E5E7EB;
+}
+
+/* Custom scrollbars for high-density panes */
+::-webkit-scrollbar {
+  width: 6px;
+  height: 6px;
+}
+
+::-webkit-scrollbar-track {
+  background: transparent;
+}
+
+::-webkit-scrollbar-thumb {
+  background: #CBD5E1;
+  border-radius: 3px;
+}
+
+::-webkit-scrollbar-thumb:hover {
+  background: #94A3B8;
 }

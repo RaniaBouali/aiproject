@@ -4,13 +4,11 @@ import React, { useState, useEffect } from 'react';
 import Link from 'next/link';
 import { usePathname, useRouter } from 'next/navigation';
 import { 
-  MapPin, 
   Search, 
   Briefcase, 
   CalendarCheck, 
   Menu, 
   X, 
-  ShieldCheck, 
   LogIn, 
   UserPlus, 
   LogOut, 
@@ -18,7 +16,7 @@ import {
   DollarSign, 
   Eye, 
   Wrench,
-  User
+  Hammer
 } from 'lucide-react';
 import { getStoredSession, clearSession, AuthSession } from '@/lib/auth-client';
 
@@ -47,10 +45,9 @@ export default function Navbar() {
   const isProvider = userRole === 'PROVIDER';
   const isClient = userRole === 'CLIENT';
 
-  // Dynamic Navigation Links strictly segregated by RBAC role
+  // Dynamic Navigation Links strictly segregated by RBAC role (tested in rbac-security.test.ts)
   const getNavLinks = () => {
     if (isProvider) {
-      // Prestataire / Artisan: strictly professional management tools
       const providerProfileId =
         session?.providerProfile?.id || session?.user.providerProfileId || 'prov-karim-meca';
 
@@ -62,14 +59,12 @@ export default function Navbar() {
     }
 
     if (isClient) {
-      // Client Particulier: search and client tracking only
       return [
         { name: 'Trouver un artisan', href: '/search', icon: Search },
         { name: 'Mes Réservations', href: '/client/dashboard', icon: CalendarCheck },
       ];
     }
 
-    // Guest / Unauthenticated
     return [
       { name: 'Trouver un service', href: '/search', icon: Search },
       { name: 'Catégories', href: '/#categories', icon: Wrench },
@@ -80,75 +75,78 @@ export default function Navbar() {
   const navLinks = getNavLinks();
 
   return (
-    <header className="sticky top-0 z-50 bg-white/95 backdrop-blur-md border-b border-slate-200">
+    <header className="sticky top-0 z-50 bg-[#F9F9F7]/95 backdrop-blur-md border-b border-stone-200/90">
       <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
         <div className="flex items-center justify-between h-16">
-          {/* Logo - links to dashboard if logged in, else home */}
+          {/* Brand Mark */}
           <Link
             href={isProvider ? '/provider/dashboard' : '/'}
-            className="flex items-center gap-2 group"
+            className="flex items-center gap-3 group"
           >
-            <div className="w-10 h-10 rounded-xl bg-gradient-to-tr from-blue-600 to-indigo-600 flex items-center justify-center text-white shadow-md shadow-blue-500/20 group-hover:scale-105 transition-transform">
-              <MapPin className="w-5 h-5" />
+            <div className="w-9 h-9 rounded-md bg-slate-900 border border-slate-800 flex items-center justify-center text-amber-500 shadow-sm transition-colors group-hover:bg-slate-800">
+              <Hammer className="w-4 h-4" />
             </div>
-            <div>
-              <span className="text-xl font-bold tracking-tight text-slate-900 group-hover:text-blue-600 transition-colors">
-                Proxi<span className="text-blue-600">Service</span>
-              </span>
-              <span className="hidden sm:inline-block text-[10px] font-medium uppercase tracking-wider text-slate-400 ml-1.5 px-1.5 py-0.5 rounded bg-slate-100">
-                {isProvider ? 'Espace Artisan' : isClient ? 'Espace Particulier' : 'Services de proximité'}
+            <div className="flex flex-col">
+              <div className="flex items-baseline gap-1.5">
+                <span className="text-lg font-bold tracking-tight text-slate-950 font-display">
+                  Proxi<span className="text-amber-700">Service</span>
+                </span>
+                <span className="text-[10px] font-mono uppercase tracking-wider text-slate-700 font-semibold px-1 py-0.5 rounded bg-stone-200">
+                  DZ
+                </span>
+              </div>
+              <span className="text-[10px] font-medium text-slate-700 tracking-wide">
+                {isProvider ? 'Atelier Prestataire' : isClient ? 'Espace Particulier' : 'Réseau d’artisans qualifiés'}
               </span>
             </div>
           </Link>
 
-          {/* Desktop Nav - Filtered by RBAC */}
+          {/* Desktop Navigation */}
           <nav className="hidden md:flex items-center gap-1">
             {navLinks.map((link) => {
               const Icon = link.icon;
-              const isActive = pathname === link.href;
+              const isActive = pathname === link.href || (link.href !== '/' && pathname.startsWith(link.href) && !link.href.includes('#'));
               return (
                 <Link
                   key={link.name}
                   href={link.href}
-                  className={`flex items-center gap-2 px-3.5 py-2 rounded-lg text-sm font-medium transition-all ${
+                  className={`flex items-center gap-2 px-3 py-1.5 rounded-md text-xs font-semibold tracking-normal transition-colors ${
                     isActive
-                      ? 'bg-blue-50 text-blue-700 font-semibold'
-                      : 'text-slate-600 hover:text-slate-900 hover:bg-slate-100'
+                      ? 'bg-stone-200/90 text-slate-950 shadow-subtle border border-stone-300/80'
+                      : 'text-slate-700 hover:text-slate-950 hover:bg-stone-200/60'
                   }`}
                 >
-                  <Icon className={`w-4 h-4 ${isActive ? 'text-blue-600' : 'text-slate-400'}`} />
+                  <Icon className={`w-3.5 h-3.5 ${isActive ? 'text-amber-700' : 'text-slate-500'}`} />
                   {link.name}
                 </Link>
               );
             })}
           </nav>
 
-          {/* Right Header Controls */}
-          <div className="hidden sm:flex items-center gap-3">
+          {/* Right Desktop Controls */}
+          <div className="hidden sm:flex items-center gap-2.5">
             {session ? (
               <div className="flex items-center gap-2">
-                {/* User Role Pill */}
-                <div className="flex items-center gap-2 px-3 py-1.5 bg-slate-100 rounded-xl text-xs font-semibold text-slate-800 border border-slate-200">
-                  <div className={`w-6 h-6 rounded-full flex items-center justify-center text-[10px] font-bold text-white ${
-                    isProvider ? 'bg-amber-600' : 'bg-blue-600'
+                <div className="flex items-center gap-2 px-2.5 py-1 bg-white rounded-md text-xs border border-stone-200 shadow-subtle">
+                  <div className={`w-5 h-5 rounded flex items-center justify-center text-[10px] font-bold text-white ${
+                    isProvider ? 'bg-amber-700' : 'bg-slate-800'
                   }`}>
-                    {session.user.name.charAt(0)}
+                    {session.user.name.charAt(0).toUpperCase()}
                   </div>
-                  <span className="max-w-[120px] truncate">{session.user.name}</span>
-                  <span className={`text-[10px] uppercase font-extrabold px-1.5 py-0.5 rounded ${
+                  <span className="max-w-[110px] truncate font-medium text-slate-800">{session.user.name}</span>
+                  <span className={`text-[10px] font-mono uppercase font-semibold px-1.5 py-0.2 rounded border ${
                     isProvider
-                      ? 'bg-amber-100 text-amber-800'
-                      : 'bg-blue-100 text-blue-800'
+                      ? 'bg-amber-50 text-amber-800 border-amber-200'
+                      : 'bg-slate-100 text-slate-700 border-slate-200'
                   }`}>
-                    {isProvider ? 'Artisan Pro' : 'Client'}
+                    {isProvider ? 'PRO' : 'CLIENT'}
                   </span>
                 </div>
 
-                {/* Logout Button */}
                 <button
                   onClick={handleLogout}
-                  title="Déconnexion sécurisée"
-                  className="p-2 text-slate-400 hover:text-rose-600 hover:bg-rose-50 rounded-xl transition"
+                  title="Déconnexion"
+                  className="p-1.5 text-slate-600 hover:text-rose-700 hover:bg-rose-50 rounded-md border border-transparent hover:border-rose-200 transition-colors"
                 >
                   <LogOut className="w-4 h-4" />
                 </button>
@@ -157,16 +155,16 @@ export default function Navbar() {
               <div className="flex items-center gap-2">
                 <Link
                   href="/login"
-                  className="px-3.5 py-2 text-xs font-semibold text-slate-700 hover:text-slate-900 hover:bg-slate-100 rounded-xl transition flex items-center gap-1.5"
+                  className="px-3 py-1.5 text-xs font-semibold text-slate-700 hover:text-slate-950 hover:bg-stone-200/70 rounded-md transition-colors flex items-center gap-1.5"
                 >
-                  <LogIn className="w-3.5 h-3.5" />
+                  <LogIn className="w-3.5 h-3.5 text-slate-600" />
                   <span>Connexion</span>
                 </Link>
                 <Link
                   href="/register"
-                  className="px-4 py-2 text-xs font-bold text-white bg-blue-600 hover:bg-blue-700 rounded-xl shadow-sm shadow-blue-500/25 transition flex items-center gap-1.5"
+                  className="px-3.5 py-1.5 text-xs font-semibold text-white bg-slate-900 hover:bg-slate-800 border border-slate-900 rounded-md shadow-subtle transition-colors flex items-center gap-1.5"
                 >
-                  <UserPlus className="w-3.5 h-3.5" />
+                  <UserPlus className="w-3.5 h-3.5 text-amber-400" />
                   <span>Inscription</span>
                 </Link>
               </div>
@@ -177,10 +175,10 @@ export default function Navbar() {
           <div className="flex md:hidden">
             <button
               onClick={() => setMobileMenuOpen(!mobileMenuOpen)}
-              className="p-2 rounded-lg text-slate-600 hover:text-slate-900 hover:bg-slate-100 focus:outline-none"
-              aria-label="Toggle menu"
+              className="p-1.5 rounded-md text-slate-700 hover:text-slate-900 hover:bg-stone-200/70 border border-stone-200 focus:outline-none"
+              aria-label="Menu"
             >
-              {mobileMenuOpen ? <X className="w-6 h-6" /> : <Menu className="w-6 h-6" />}
+              {mobileMenuOpen ? <X className="w-5 h-5" /> : <Menu className="w-5 h-5" />}
             </button>
           </div>
         </div>
@@ -188,7 +186,7 @@ export default function Navbar() {
 
       {/* Mobile Drawer */}
       {mobileMenuOpen && (
-        <div className="md:hidden border-b border-slate-200 bg-white px-4 pt-2 pb-4 space-y-2">
+        <div className="md:hidden border-b border-stone-200 bg-[#F9F9F7] px-4 pt-2 pb-4 space-y-2">
           {navLinks.map((link) => {
             const Icon = link.icon;
             const isActive = pathname === link.href;
@@ -197,27 +195,27 @@ export default function Navbar() {
                 key={link.name}
                 href={link.href}
                 onClick={() => setMobileMenuOpen(false)}
-                className={`flex items-center gap-3 px-3 py-2.5 rounded-lg text-base font-medium ${
+                className={`flex items-center gap-3 px-3 py-2 rounded-md text-sm font-semibold ${
                   isActive
-                    ? 'bg-blue-50 text-blue-700 font-semibold'
-                    : 'text-slate-700 hover:bg-slate-100'
+                    ? 'bg-stone-200 text-slate-900 border border-stone-300'
+                    : 'text-slate-700 hover:bg-stone-200/50'
                 }`}
               >
-                <Icon className="w-5 h-5 text-blue-600" />
+                <Icon className="w-4 h-4 text-amber-700" />
                 {link.name}
               </Link>
             );
           })}
 
-          <div className="pt-2 border-t border-slate-100 flex flex-col gap-2">
+          <div className="pt-3 border-t border-stone-200 flex flex-col gap-2">
             {session ? (
               <>
-                <div className="p-3 bg-slate-50 rounded-xl text-xs flex items-center justify-between">
-                  <span className="font-semibold text-slate-800">{session.user.name}</span>
-                  <span className={`text-[10px] font-bold px-2 py-0.5 rounded ${
-                    isProvider ? 'bg-amber-100 text-amber-800' : 'bg-blue-100 text-blue-800'
+                <div className="p-2.5 bg-white rounded-md border border-stone-200 text-xs flex items-center justify-between">
+                  <span className="font-semibold text-slate-900">{session.user.name}</span>
+                  <span className={`text-[10px] font-mono uppercase font-bold px-1.5 py-0.5 rounded border ${
+                    isProvider ? 'bg-amber-50 text-amber-800 border-amber-200' : 'bg-slate-100 text-slate-700 border-slate-200'
                   }`}>
-                    {isProvider ? 'Artisan Pro' : 'Client'}
+                    {isProvider ? 'PRO' : 'CLIENT'}
                   </span>
                 </div>
                 <button
@@ -225,7 +223,7 @@ export default function Navbar() {
                     handleLogout();
                     setMobileMenuOpen(false);
                   }}
-                  className="w-full py-2.5 text-xs font-semibold text-rose-600 bg-rose-50 rounded-xl flex items-center justify-center gap-1.5"
+                  className="w-full py-2 text-xs font-semibold text-rose-700 bg-rose-50 border border-rose-200 rounded-md flex items-center justify-center gap-1.5"
                 >
                   <LogOut className="w-3.5 h-3.5" />
                   <span>Déconnexion</span>
@@ -236,14 +234,14 @@ export default function Navbar() {
                 <Link
                   href="/login"
                   onClick={() => setMobileMenuOpen(false)}
-                  className="py-2.5 text-center text-xs font-semibold text-slate-700 bg-slate-100 rounded-xl"
+                  className="py-2 text-center text-xs font-semibold text-slate-800 bg-white border border-stone-300 rounded-md shadow-subtle"
                 >
                   Connexion
                 </Link>
                 <Link
                   href="/register"
                   onClick={() => setMobileMenuOpen(false)}
-                  className="py-2.5 text-center text-xs font-semibold text-white bg-blue-600 rounded-xl"
+                  className="py-2 text-center text-xs font-semibold text-white bg-slate-900 rounded-md shadow-subtle"
                 >
                   Inscription
                 </Link>

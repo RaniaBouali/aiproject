@@ -6,18 +6,11 @@ import { useRouter } from 'next/navigation';
 import { 
   User, 
   Briefcase, 
-  Mail, 
-  Lock, 
-  Phone, 
-  MapPin, 
   Plus, 
   Trash2, 
   CheckCircle2, 
   AlertCircle, 
-  Wrench, 
-  Image as ImageIcon,
-  DollarSign,
-  Clock
+  Hammer
 } from 'lucide-react';
 import { INITIAL_CATEGORIES } from '@/lib/data-store';
 import { saveSession } from '@/lib/auth-client';
@@ -130,7 +123,7 @@ export default function RegisterPage() {
 
       if (role === 'PROVIDER') {
         payload.categorySlug = categorySlug;
-        payload.bio = bio || `Artisan professionnel spécialisé en ${categorySlug}.`;
+        payload.bio = bio || `Artisan professionnel qualifié spécialisé en ${categorySlug}.`;
         payload.experienceYears = Number(experienceYears);
         payload.operationalRadiusKm = Number(operationalRadiusKm);
         payload.services = services.filter((s) => s.title.trim().length > 0);
@@ -167,66 +160,69 @@ export default function RegisterPage() {
   };
 
   return (
-    <div className="min-h-screen bg-slate-50 py-12 px-4 sm:px-6 lg:px-8">
-      <div className="max-w-3xl mx-auto space-y-8">
+    <div className="min-h-screen bg-[#F9F9F7] py-12 px-4 sm:px-6 lg:px-8">
+      <div className="max-w-2xl mx-auto space-y-6">
         {/* Header */}
         <div className="text-center space-y-2">
-          <h1 className="text-3xl font-extrabold text-slate-900 tracking-tight">
-            Créer un compte ProxiService
+          <div className="inline-flex items-center justify-center w-10 h-10 rounded-md bg-slate-950 text-amber-500 border border-slate-800 shadow-subtle mx-auto">
+            <Hammer className="w-5 h-5" />
+          </div>
+          <h1 className="text-2xl sm:text-3xl font-bold text-slate-950 font-display">
+            Inscription au Réseau ProxiService
           </h1>
-          <p className="text-sm text-slate-500">
-            Rejoignez notre communauté de confiance en tant que client ou prestataire qualifié
+          <p className="text-xs text-slate-500">
+            Rejoignez notre réseau de proximité en tant que particulier ou artisan qualifié
           </p>
         </div>
 
         {/* Role Toggle Selector */}
-        <div className="grid grid-cols-2 gap-3 p-1.5 bg-slate-200/80 rounded-2xl max-w-lg mx-auto">
+        <div className="grid grid-cols-2 gap-2 p-1 bg-stone-200 rounded-md max-w-md mx-auto text-xs font-mono">
           <button
             type="button"
             onClick={() => setRole('PROVIDER')}
-            className={`flex items-center justify-center gap-2 py-3 px-4 rounded-xl text-xs sm:text-sm font-bold transition ${
+            className={`flex items-center justify-center gap-2 py-2 px-3 rounded font-bold transition ${
               role === 'PROVIDER'
-                ? 'bg-blue-600 text-white shadow-md'
-                : 'text-slate-600 hover:text-slate-900'
+                ? 'bg-slate-950 text-white shadow-subtle'
+                : 'text-slate-700 hover:text-slate-950'
             }`}
           >
-            <Briefcase className="w-4 h-4" />
-            <span>Je suis Prestataire / Artisan</span>
+            <Briefcase className="w-3.5 h-3.5 text-amber-400" />
+            <span>Je suis Artisan Pro</span>
           </button>
 
           <button
             type="button"
             onClick={() => setRole('CLIENT')}
-            className={`flex items-center justify-center gap-2 py-3 px-4 rounded-xl text-xs sm:text-sm font-bold transition ${
+            className={`flex items-center justify-center gap-2 py-2 px-3 rounded font-bold transition ${
               role === 'CLIENT'
-                ? 'bg-blue-600 text-white shadow-md'
-                : 'text-slate-600 hover:text-slate-900'
+                ? 'bg-slate-950 text-white shadow-subtle'
+                : 'text-slate-700 hover:text-slate-950'
             }`}
           >
-            <User className="w-4 h-4" />
-            <span>Je cherche un service (Client)</span>
+            <User className="w-3.5 h-3.5 text-amber-400" />
+            <span>Je cherche un service</span>
           </button>
         </div>
 
-        {/* Main Card */}
-        <div className="bg-white p-6 sm:p-10 rounded-3xl border border-slate-200/80 shadow-xl space-y-6">
+        {/* Main Form Container */}
+        <div className="bg-white p-6 sm:p-8 rounded-lg border border-stone-300 shadow-card space-y-5">
           {error && (
-            <div className="p-3.5 bg-rose-50 border border-rose-200 rounded-xl text-xs text-rose-700 flex items-center gap-2">
+            <div className="p-2.5 bg-rose-50 border border-rose-200 rounded text-xs text-rose-700 flex items-center gap-2">
               <AlertCircle className="w-4 h-4 shrink-0" />
               <span>{error}</span>
             </div>
           )}
 
-          <form onSubmit={handleSubmit} className="space-y-6">
-            {/* Section 1: Coordonnées de base */}
-            <div className="space-y-4">
-              <h3 className="text-sm font-bold uppercase tracking-wider text-slate-800 border-b border-slate-100 pb-2">
-                1. Vos coordonnées & Identifiants
+          <form onSubmit={handleSubmit} className="space-y-5">
+            {/* Section 1: Identification */}
+            <div className="space-y-3">
+              <h3 className="text-xs font-bold uppercase tracking-wider text-slate-900 border-b border-stone-200 pb-1.5 font-mono">
+                1. Identification & Coordonnées
               </h3>
 
-              <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
+              <div className="grid grid-cols-1 sm:grid-cols-2 gap-3">
                 <div>
-                  <label className="block text-xs font-semibold text-slate-700 mb-1">
+                  <label className="block text-[11px] font-mono text-slate-600 mb-1">
                     Nom et Prénom *
                   </label>
                   <input
@@ -235,13 +231,13 @@ export default function RegisterPage() {
                     value={name}
                     onChange={(e) => setName(e.target.value)}
                     placeholder="Ex: Karim Benali"
-                    className="w-full text-xs sm:text-sm px-3.5 py-2.5 bg-slate-50 border border-slate-300 rounded-xl focus:bg-white focus:ring-2 focus:ring-blue-500 outline-none"
+                    className="w-full text-xs px-2.5 py-1.5 bg-stone-50 border border-stone-300 rounded focus:bg-white focus:border-slate-900 outline-none"
                   />
                 </div>
 
                 <div>
-                  <label className="block text-xs font-semibold text-slate-700 mb-1">
-                    Numéro de Téléphone *
+                  <label className="block text-[11px] font-mono text-slate-600 mb-1">
+                    Téléphone direct *
                   </label>
                   <input
                     type="tel"
@@ -249,15 +245,15 @@ export default function RegisterPage() {
                     value={phone}
                     onChange={(e) => setPhone(e.target.value)}
                     placeholder="+213 550..."
-                    className="w-full text-xs sm:text-sm px-3.5 py-2.5 bg-slate-50 border border-slate-300 rounded-xl focus:bg-white focus:ring-2 focus:ring-blue-500 outline-none"
+                    className="w-full text-xs px-2.5 py-1.5 bg-stone-50 border border-stone-300 rounded focus:bg-white focus:border-slate-900 outline-none font-mono"
                   />
                 </div>
               </div>
 
-              <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
+              <div className="grid grid-cols-1 sm:grid-cols-2 gap-3">
                 <div>
-                  <label className="block text-xs font-semibold text-slate-700 mb-1">
-                    Adresse Email *
+                  <label className="block text-[11px] font-mono text-slate-600 mb-1">
+                    Adresse électronique *
                   </label>
                   <input
                     type="email"
@@ -265,12 +261,12 @@ export default function RegisterPage() {
                     value={email}
                     onChange={(e) => setEmail(e.target.value)}
                     placeholder="nom@exemple.com"
-                    className="w-full text-xs sm:text-sm px-3.5 py-2.5 bg-slate-50 border border-slate-300 rounded-xl focus:bg-white focus:ring-2 focus:ring-blue-500 outline-none"
+                    className="w-full text-xs px-2.5 py-1.5 bg-stone-50 border border-stone-300 rounded focus:bg-white focus:border-slate-900 outline-none"
                   />
                 </div>
 
                 <div>
-                  <label className="block text-xs font-semibold text-slate-700 mb-1">
+                  <label className="block text-[11px] font-mono text-slate-600 mb-1">
                     Mot de passe *
                   </label>
                   <input
@@ -279,14 +275,14 @@ export default function RegisterPage() {
                     value={password}
                     onChange={(e) => setPassword(e.target.value)}
                     placeholder="Minimum 6 caractères"
-                    className="w-full text-xs sm:text-sm px-3.5 py-2.5 bg-slate-50 border border-slate-300 rounded-xl focus:bg-white focus:ring-2 focus:ring-blue-500 outline-none"
+                    className="w-full text-xs px-2.5 py-1.5 bg-stone-50 border border-stone-300 rounded focus:bg-white focus:border-slate-900 outline-none font-mono"
                   />
                 </div>
               </div>
 
               <div>
-                <label className="block text-xs font-semibold text-slate-700 mb-1">
-                  Adresse / Ville de résidence *
+                <label className="block text-[11px] font-mono text-slate-600 mb-1">
+                  Adresse / Commune de base *
                 </label>
                 <input
                   type="text"
@@ -294,7 +290,7 @@ export default function RegisterPage() {
                   value={addressText}
                   onChange={(e) => setAddressText(e.target.value)}
                   placeholder="Quartier, Ville (Ex: Bab El Oued, Alger)"
-                  className="w-full text-xs sm:text-sm px-3.5 py-2.5 bg-slate-50 border border-slate-300 rounded-xl focus:bg-white focus:ring-2 focus:ring-blue-500 outline-none"
+                  className="w-full text-xs px-2.5 py-1.5 bg-stone-50 border border-stone-300 rounded focus:bg-white focus:border-slate-900 outline-none"
                 />
               </div>
             </div>
@@ -302,21 +298,21 @@ export default function RegisterPage() {
             {/* Provider Section */}
             {role === 'PROVIDER' && (
               <>
-                {/* Section 2: Métier & Zone de chalandise */}
-                <div className="space-y-4 pt-4 border-t border-slate-100">
-                  <h3 className="text-sm font-bold uppercase tracking-wider text-slate-800 border-b border-slate-100 pb-2">
-                    2. Spécialité & Zone d'intervention
+                {/* Section 2: Spécialité & Périmètre */}
+                <div className="space-y-3 pt-3 border-t border-stone-200">
+                  <h3 className="text-xs font-bold uppercase tracking-wider text-slate-900 border-b border-stone-200 pb-1.5 font-mono">
+                    2. Corps d&apos;état & Zone d&apos;intervention
                   </h3>
 
-                  <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
+                  <div className="grid grid-cols-1 sm:grid-cols-2 gap-3">
                     <div>
-                      <label className="block text-xs font-semibold text-slate-700 mb-1">
-                        Votre métier principal *
+                      <label className="block text-[11px] font-mono text-slate-600 mb-1">
+                        Corps de métier *
                       </label>
                       <select
                         value={categorySlug}
                         onChange={(e) => setCategorySlug(e.target.value)}
-                        className="w-full text-xs sm:text-sm px-3.5 py-2.5 bg-slate-50 border border-slate-300 rounded-xl font-medium focus:bg-white focus:ring-2 focus:ring-blue-500 outline-none cursor-pointer"
+                        className="w-full text-xs px-2.5 py-1.5 bg-stone-50 border border-stone-300 rounded focus:bg-white focus:border-slate-900 outline-none cursor-pointer"
                       >
                         {INITIAL_CATEGORIES.map((cat) => (
                           <option key={cat.id} value={cat.slug}>
@@ -327,8 +323,8 @@ export default function RegisterPage() {
                     </div>
 
                     <div>
-                      <label className="block text-xs font-semibold text-slate-700 mb-1">
-                        Années d'expérience *
+                      <label className="block text-[11px] font-mono text-slate-600 mb-1">
+                        Années d&apos;expérience *
                       </label>
                       <input
                         type="number"
@@ -336,15 +332,15 @@ export default function RegisterPage() {
                         max="50"
                         value={experienceYears}
                         onChange={(e) => setExperienceYears(Number(e.target.value))}
-                        className="w-full text-xs sm:text-sm px-3.5 py-2.5 bg-slate-50 border border-slate-300 rounded-xl focus:bg-white focus:ring-2 focus:ring-blue-500 outline-none"
+                        className="w-full text-xs px-2.5 py-1.5 bg-stone-50 border border-stone-300 rounded focus:bg-white focus:border-slate-900 outline-none font-mono"
                       />
                     </div>
                   </div>
 
                   <div>
-                    <div className="flex justify-between items-center text-xs font-semibold text-slate-700 mb-1">
-                      <span>Rayon d'intervention maximal :</span>
-                      <span className="font-bold text-blue-600">{operationalRadiusKm} km autour de votre base</span>
+                    <div className="flex justify-between items-center text-xs font-mono mb-1">
+                      <span className="text-slate-600">Rayon d&apos;intervention kilométrique :</span>
+                      <span className="font-bold text-slate-950 tabular-nums">{operationalRadiusKm} km</span>
                     </div>
                     <input
                       type="range"
@@ -353,105 +349,102 @@ export default function RegisterPage() {
                       step="5"
                       value={operationalRadiusKm}
                       onChange={(e) => setOperationalRadiusKm(Number(e.target.value))}
-                      className="w-full accent-blue-600 cursor-pointer h-2 bg-slate-200 rounded-lg"
+                      className="w-full accent-amber-600 cursor-pointer h-1.5 bg-stone-200 rounded"
                     />
-                    <p className="text-[11px] text-slate-400 mt-1">
-                      Les clients situés dans ce périmètre verront automatiquement votre profil en tête des résultats.
-                    </p>
                   </div>
 
                   <div>
-                    <label className="block text-xs font-semibold text-slate-700 mb-1">
-                      Bio / Présentation de votre savoir-faire
+                    <label className="block text-[11px] font-mono text-slate-600 mb-1">
+                      Présentation de vos compétences & garanties
                     </label>
                     <textarea
                       rows={3}
                       value={bio}
                       onChange={(e) => setBio(e.target.value)}
-                      placeholder="Décrivez vos compétences, votre outillage, vos garanties..."
-                      className="w-full text-xs sm:text-sm px-3.5 py-2.5 bg-slate-50 border border-slate-300 rounded-xl focus:bg-white focus:ring-2 focus:ring-blue-500 outline-none resize-none"
+                      placeholder="Décrivez vos compétences, votre outillage, vos garanties de travail..."
+                      className="w-full text-xs px-2.5 py-1.5 bg-stone-50 border border-stone-300 rounded focus:bg-white focus:border-slate-900 outline-none resize-none leading-relaxed"
                     />
                   </div>
                 </div>
 
-                {/* Section 3: Catalogue des Prestations & Tarifs */}
-                <div className="space-y-4 pt-4 border-t border-slate-100">
-                  <div className="flex items-center justify-between border-b border-slate-100 pb-2">
-                    <h3 className="text-sm font-bold uppercase tracking-wider text-slate-800">
-                      3. Vos Prestations & Tarifs (Fixes ou Horaires)
+                {/* Section 3: Catalogue Initial des Tarifs */}
+                <div className="space-y-3 pt-3 border-t border-stone-200">
+                  <div className="flex items-center justify-between border-b border-stone-200 pb-1.5">
+                    <h3 className="text-xs font-bold uppercase tracking-wider text-slate-900 font-mono">
+                      3. Prestations & Tarifs Déclarés (DZD)
                     </h3>
                     <button
                       type="button"
                       onClick={handleAddService}
-                      className="inline-flex items-center gap-1 px-3 py-1 bg-blue-50 hover:bg-blue-100 text-blue-700 text-xs font-semibold rounded-lg transition"
+                      className="inline-flex items-center gap-1 px-2.5 py-1 bg-stone-100 hover:bg-stone-200 text-slate-800 text-[11px] font-semibold rounded border border-stone-300 transition font-mono"
                     >
-                      <Plus className="w-3.5 h-3.5" />
-                      <span>Ajouter un service</span>
+                      <Plus className="w-3 h-3 text-amber-700" />
+                      <span>Ajouter</span>
                     </button>
                   </div>
 
-                  <div className="space-y-3">
+                  <div className="space-y-2.5">
                     {services.map((srv, idx) => (
                       <div
                         key={idx}
-                        className="p-4 bg-slate-50 rounded-2xl border border-slate-200 space-y-3 relative"
+                        className="p-3.5 bg-stone-50 rounded-md border border-stone-200 space-y-2.5"
                       >
                         <div className="flex items-center justify-between">
-                          <span className="text-xs font-bold text-slate-700">Prestation #{idx + 1}</span>
+                          <span className="text-[11px] font-mono font-bold text-slate-700">Prestation #{idx + 1}</span>
                           {services.length > 1 && (
                             <button
                               type="button"
                               onClick={() => handleRemoveService(idx)}
-                              className="text-rose-500 hover:text-rose-700 p-1"
-                              title="Supprimer ce service"
+                              className="text-rose-600 hover:text-rose-800 p-0.5 text-xs font-mono"
+                              title="Supprimer"
                             >
-                              <Trash2 className="w-4 h-4" />
+                              <Trash2 className="w-3.5 h-3.5" />
                             </button>
                           )}
                         </div>
 
-                        <div className="grid grid-cols-1 sm:grid-cols-3 gap-3">
+                        <div className="grid grid-cols-1 sm:grid-cols-3 gap-2">
                           <div className="sm:col-span-2">
                             <input
                               type="text"
                               required
-                              placeholder="Intitulé du service (ex: Vidange moteur, Nettoyage vitre)"
+                              placeholder="Intitulé de la prestation"
                               value={srv.title}
                               onChange={(e) => handleUpdateService(idx, 'title', e.target.value)}
-                              className="w-full text-xs px-3 py-2 bg-white border border-slate-300 rounded-xl outline-none"
+                              className="w-full text-xs px-2.5 py-1.5 bg-white border border-stone-300 rounded outline-none font-medium"
                             />
                           </div>
                           <div>
                             <select
                               value={srv.priceType}
                               onChange={(e) => handleUpdateService(idx, 'priceType', e.target.value)}
-                              className="w-full text-xs px-3 py-2 bg-white border border-slate-300 rounded-xl outline-none"
+                              className="w-full text-xs px-2.5 py-1.5 bg-white border border-stone-300 rounded outline-none font-mono"
                             >
-                              <option value="FIXED">Tarif Forfaitaire</option>
-                              <option value="HOURLY">Tarif par Heure</option>
+                              <option value="FIXED">Forfaitaire</option>
+                              <option value="HOURLY">Par Heure</option>
                               <option value="ESTIMATE">Sur Devis</option>
                             </select>
                           </div>
                         </div>
 
-                        <div className="grid grid-cols-2 gap-3">
+                        <div className="grid grid-cols-2 gap-2">
                           <div>
-                            <label className="block text-[11px] text-slate-500 mb-0.5">Prix (en DA)</label>
+                            <label className="block text-[10px] font-mono text-slate-500 mb-0.5">Prix en DZD</label>
                             <input
                               type="number"
                               required
                               value={srv.price}
                               onChange={(e) => handleUpdateService(idx, 'price', Number(e.target.value))}
-                              className="w-full text-xs px-3 py-2 bg-white border border-slate-300 rounded-xl outline-none font-bold text-blue-600"
+                              className="w-full text-xs px-2.5 py-1.5 bg-white border border-stone-300 rounded outline-none font-bold font-mono text-slate-900"
                             />
                           </div>
                           <div>
-                            <label className="block text-[11px] text-slate-500 mb-0.5">Durée estimée (minutes)</label>
+                            <label className="block text-[10px] font-mono text-slate-500 mb-0.5">Durée (min)</label>
                             <input
                               type="number"
                               value={srv.durationMinutes}
                               onChange={(e) => handleUpdateService(idx, 'durationMinutes', Number(e.target.value))}
-                              className="w-full text-xs px-3 py-2 bg-white border border-slate-300 rounded-xl outline-none"
+                              className="w-full text-xs px-2.5 py-1.5 bg-white border border-stone-300 rounded outline-none font-mono"
                             />
                           </div>
                         </div>
@@ -459,10 +452,10 @@ export default function RegisterPage() {
                         <div>
                           <input
                             type="text"
-                            placeholder="Description courte de ce qui est inclus..."
+                            placeholder="Description des tâches et pièces incluses..."
                             value={srv.description}
                             onChange={(e) => handleUpdateService(idx, 'description', e.target.value)}
-                            className="w-full text-xs px-3 py-2 bg-white border border-slate-300 rounded-xl outline-none"
+                            className="w-full text-xs px-2.5 py-1.5 bg-white border border-stone-300 rounded outline-none"
                           />
                         </div>
                       </div>
@@ -470,29 +463,29 @@ export default function RegisterPage() {
                   </div>
                 </div>
 
-                {/* Section 4: Anciennes Réalisations / Portfolio */}
-                <div className="space-y-4 pt-4 border-t border-slate-100">
-                  <div className="flex items-center justify-between border-b border-slate-100 pb-2">
-                    <h3 className="text-sm font-bold uppercase tracking-wider text-slate-800">
-                      4. Anciens Travaux & Portfolio (Photos)
+                {/* Section 4: Réalisations */}
+                <div className="space-y-3 pt-3 border-t border-stone-200">
+                  <div className="flex items-center justify-between border-b border-stone-200 pb-1.5">
+                    <h3 className="text-xs font-bold uppercase tracking-wider text-slate-900 font-mono">
+                      4. Portfolio & Photos de Chantiers
                     </h3>
                     <button
                       type="button"
                       onClick={handleAddPortfolio}
-                      className="inline-flex items-center gap-1 px-3 py-1 bg-blue-50 hover:bg-blue-100 text-blue-700 text-xs font-semibold rounded-lg transition"
+                      className="inline-flex items-center gap-1 px-2.5 py-1 bg-stone-100 hover:bg-stone-200 text-slate-800 text-[11px] font-semibold rounded border border-stone-300 transition font-mono"
                     >
-                      <Plus className="w-3.5 h-3.5" />
-                      <span>Ajouter une réalisation</span>
+                      <Plus className="w-3 h-3 text-amber-700" />
+                      <span>Ajouter</span>
                     </button>
                   </div>
 
-                  <div className="space-y-3">
+                  <div className="space-y-2.5">
                     {portfolio.map((item, idx) => (
                       <div
                         key={idx}
-                        className="p-4 bg-slate-50 rounded-2xl border border-slate-200 flex flex-col sm:flex-row gap-4 items-start"
+                        className="p-3 bg-stone-50 rounded-md border border-stone-200 flex flex-col sm:flex-row gap-3 items-start"
                       >
-                        <div className="w-20 h-20 rounded-xl bg-slate-200 overflow-hidden shrink-0 border border-slate-300">
+                        <div className="w-16 h-16 rounded bg-stone-200 overflow-hidden shrink-0 border border-stone-300">
                           <img
                             src={item.imageUrl}
                             alt="Aperçu"
@@ -500,14 +493,14 @@ export default function RegisterPage() {
                           />
                         </div>
 
-                        <div className="flex-1 w-full space-y-2">
+                        <div className="flex-1 w-full space-y-1.5">
                           <div className="flex items-center justify-between">
-                            <span className="text-xs font-bold text-slate-700">Photo #{idx + 1}</span>
+                            <span className="text-[11px] font-mono font-bold text-slate-700">Photo #{idx + 1}</span>
                             {portfolio.length > 1 && (
                               <button
                                 type="button"
                                 onClick={() => handleRemovePortfolio(idx)}
-                                className="text-rose-500 hover:text-rose-700 p-0.5"
+                                className="text-rose-600 hover:text-rose-800 p-0.5"
                               >
                                 <Trash2 className="w-3.5 h-3.5" />
                               </button>
@@ -516,18 +509,18 @@ export default function RegisterPage() {
 
                           <input
                             type="text"
-                            placeholder="Titre du travail (ex: Rénovation salle de bain, Révision Golf 7)"
+                            placeholder="Titre de la réalisation (ex: Réfection armoire électrique)"
                             value={item.title}
                             onChange={(e) => handleUpdatePortfolio(idx, 'title', e.target.value)}
-                            className="w-full text-xs px-3 py-1.5 bg-white border border-slate-300 rounded-xl outline-none"
+                            className="w-full text-xs px-2.5 py-1 bg-white border border-stone-300 rounded outline-none"
                           />
 
                           <input
                             type="url"
-                            placeholder="URL de l'image (Unsplash ou hébergée)"
+                            placeholder="URL de l'image"
                             value={item.imageUrl}
                             onChange={(e) => handleUpdatePortfolio(idx, 'imageUrl', e.target.value)}
-                            className="w-full text-xs px-3 py-1.5 bg-white border border-slate-300 rounded-xl outline-none"
+                            className="w-full text-xs px-2.5 py-1 bg-white border border-stone-300 rounded outline-none font-mono"
                           />
                         </div>
                       </div>
@@ -538,19 +531,19 @@ export default function RegisterPage() {
             )}
 
             {/* Submit Button */}
-            <div className="pt-6 border-t border-slate-100">
+            <div className="pt-4 border-t border-stone-200">
               <button
                 type="submit"
                 disabled={loading}
-                className="w-full py-4 px-6 bg-blue-600 hover:bg-blue-700 active:scale-95 text-white font-bold rounded-2xl shadow-xl shadow-blue-500/25 text-sm transition flex items-center justify-center gap-2 disabled:opacity-50"
+                className="w-full py-2.5 px-4 bg-slate-950 hover:bg-slate-800 text-white font-semibold rounded text-xs shadow-subtle transition flex items-center justify-center gap-2 disabled:opacity-50"
               >
-                <CheckCircle2 className="w-5 h-5" />
+                <CheckCircle2 className="w-4 h-4 text-emerald-400" />
                 <span>
                   {loading
-                    ? 'Création du compte en cours...'
+                    ? 'Création du compte...'
                     : role === 'PROVIDER'
-                    ? 'Publier ma vitrine artisan & Créer mon compte'
-                    : 'Créer mon compte Client'}
+                    ? 'Valider mon inscription Artisan & Ouvrir le Cockpit'
+                    : 'Créer mon compte Particulier'}
                 </span>
               </button>
             </div>
@@ -558,9 +551,9 @@ export default function RegisterPage() {
 
           <div className="text-center pt-2">
             <p className="text-xs text-slate-500">
-              Vous avez déjà un compte ?{' '}
-              <Link href="/login" className="font-bold text-blue-600 hover:underline">
-                Se connecter
+              Vous possédez déjà un compte ?{' '}
+              <Link href="/login" className="font-semibold text-slate-950 hover:text-amber-800 underline">
+                Connexion directe
               </Link>
             </p>
           </div>

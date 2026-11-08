@@ -7,11 +7,11 @@ import { formatDistance } from '@/lib/geo';
 import { 
   Star, 
   MapPin, 
-  CheckCircle, 
-  Clock, 
   ShieldCheck, 
+  Clock, 
   ArrowRight,
-  Briefcase
+  Wrench,
+  Check
 } from 'lucide-react';
 
 interface ProviderCardProps {
@@ -30,108 +30,118 @@ export default function ProviderCard({
     : 0;
 
   return (
-    <div
-      className={`group relative bg-white rounded-2xl border transition-all duration-300 p-5 shadow-sm hover:shadow-xl ${
+    <article
+      className={`group relative bg-white rounded-lg border transition-all duration-200 p-5 ${
         isHighlighted
-          ? 'border-blue-500 ring-2 ring-blue-500/20 shadow-md'
-          : 'border-slate-200/80 hover:border-blue-300'
+          ? 'border-slate-900 ring-2 ring-slate-900/10 shadow-elevated'
+          : 'border-stone-200/90 hover:border-stone-400 shadow-card hover:shadow-elevated'
       }`}
     >
       <div className="flex flex-col sm:flex-row items-start gap-4">
-        {/* Avatar */}
+        {/* Artisan Avatar & Verification Badge */}
         <div className="relative shrink-0">
           <img
             src={provider.avatar}
             alt={provider.name}
-            className="w-16 h-16 sm:w-20 sm:h-20 rounded-2xl object-cover border border-slate-200 shadow-sm"
+            className="w-16 h-16 sm:w-20 sm:h-20 rounded-md object-cover border border-stone-200 bg-stone-100"
           />
           {provider.isVerified && (
             <div
-              title="Profil vérifié"
-              className="absolute -bottom-1.5 -right-1.5 bg-blue-600 text-white p-1 rounded-full border-2 border-white shadow"
+              title="Artisan vérifié par ProxiService"
+              className="absolute -bottom-1 -right-1 bg-emerald-700 text-white p-0.5 rounded border border-white shadow-sm flex items-center justify-center"
             >
-              <CheckCircle className="w-3.5 h-3.5" />
+              <Check className="w-3 h-3 stroke-[3]" />
             </div>
           )}
         </div>
 
-        {/* Content */}
+        {/* Core Profile Details */}
         <div className="flex-1 min-w-0">
-          <div className="flex flex-wrap items-center justify-between gap-2 mb-1">
-            <Link
-              href={`/providers/${provider.id}`}
-              className="text-lg font-bold text-slate-900 group-hover:text-blue-600 transition-colors truncate"
-            >
-              {provider.name}
-            </Link>
+          <div className="flex flex-wrap items-center justify-between gap-2 mb-1.5">
+            <div className="flex items-center gap-2">
+              <Link
+                href={`/providers/${provider.id}`}
+                className="text-base font-bold text-slate-950 hover:text-amber-800 transition-colors truncate font-display"
+              >
+                {provider.name}
+              </Link>
+              {provider.isVerified && (
+                <span className="hidden sm:inline-flex items-center gap-1 text-[11px] font-medium text-emerald-800 bg-emerald-50 px-1.5 py-0.2 rounded border border-emerald-200">
+                  <ShieldCheck className="w-3 h-3 text-emerald-700" />
+                  Vérifié
+                </span>
+              )}
+            </div>
 
-            {/* Distance badge */}
-            <div className="inline-flex items-center gap-1 px-2.5 py-1 rounded-full text-xs font-semibold bg-emerald-50 text-emerald-700 border border-emerald-200/60">
-              <MapPin className="w-3 h-3 text-emerald-600" />
+            {/* Distance calculation */}
+            <div className="inline-flex items-center gap-1 px-2 py-0.5 rounded text-xs font-mono font-medium bg-stone-100 text-slate-800 border border-stone-200">
+              <MapPin className="w-3 h-3 text-slate-500" />
               <span>{formatDistance(provider.distanceKm)}</span>
             </div>
           </div>
 
-          {/* Categories */}
+          {/* Trade Category Tags & Experience */}
           <div className="flex flex-wrap items-center gap-1.5 mb-2.5">
             {provider.categories.map((cat) => (
               <span
                 key={cat.id}
-                className="px-2 py-0.5 rounded-md text-xs font-medium bg-blue-50 text-blue-700 border border-blue-100"
+                className="px-2 py-0.5 rounded text-xs font-semibold bg-stone-100 text-slate-800 border border-stone-200"
               >
                 {cat.name}
               </span>
             ))}
-            <span className="text-xs text-slate-400">• {provider.experienceYears} ans d'expérience</span>
+            <span className="text-xs text-slate-500">
+              &bull; {provider.experienceYears} ans de métier
+            </span>
           </div>
 
-          {/* Ratings & reviews */}
-          <div className="flex items-center gap-3 text-xs text-slate-500 mb-3">
-            <div className="flex items-center gap-1 text-amber-500 font-semibold">
-              <Star className="w-4 h-4 fill-amber-400 text-amber-400" />
-              <span className="text-slate-800 text-sm">{provider.ratingAverage.toFixed(1)}</span>
+          {/* Rating, Reviews & Address */}
+          <div className="flex flex-wrap items-center gap-x-3 gap-y-1 text-xs text-slate-600 mb-2.5">
+            <div className="flex items-center gap-1 text-amber-600 font-bold tabular-nums">
+              <Star className="w-3.5 h-3.5 fill-amber-500 text-amber-500" />
+              <span className="text-slate-900">{provider.ratingAverage.toFixed(1)}</span>
             </div>
-            <span>({provider.reviewCount} avis certifiés)</span>
-            <span>•</span>
+            <span className="text-slate-500">({provider.reviewCount} avis clients)</span>
+            <span className="text-stone-300 hidden sm:inline">&bull;</span>
             <span className="text-slate-600 truncate">{provider.addressText}</span>
           </div>
 
-          {/* Bio snippet */}
-          <p className="text-xs text-slate-600 line-clamp-2 mb-4 leading-relaxed">
+          {/* Bio statement */}
+          <p className="text-xs text-slate-600 line-clamp-2 mb-4 leading-relaxed font-sans">
             {provider.bio}
           </p>
 
-          {/* Pricing & Actions */}
-          <div className="pt-3 border-t border-slate-100 flex flex-wrap items-center justify-between gap-3">
+          {/* Tariff Block & Immediate Actions */}
+          <div className="pt-3 border-t border-stone-200/80 flex flex-wrap items-center justify-between gap-3">
             <div>
-              <span className="text-[11px] uppercase tracking-wider text-slate-400 font-medium block">
-                Tarif indicatif
+              <span className="text-[10px] uppercase tracking-wider text-slate-500 font-bold block font-mono">
+                Grille d&apos;intervention
               </span>
-              <span className="text-base font-bold text-slate-900">
-                À partir de {minPrice.toLocaleString()} DA
+              <span className="text-sm font-bold text-slate-950 font-mono tabular-nums">
+                Dès {minPrice.toLocaleString()} DZD
               </span>
             </div>
 
             <div className="flex items-center gap-2">
               <Link
                 href={`/providers/${provider.id}`}
-                className="px-3.5 py-2 rounded-xl text-xs font-semibold text-slate-700 bg-slate-100 hover:bg-slate-200 transition-colors"
+                className="px-3 py-1.5 rounded-md text-xs font-semibold text-slate-800 bg-stone-100 hover:bg-stone-200/80 border border-stone-300/80 transition-colors"
               >
-                Profil & avis
+                Vitrine & Avis
               </Link>
 
               <button
                 type="button"
                 onClick={() => onBookClick && onBookClick(provider)}
-                className="inline-flex items-center gap-1.5 px-4 py-2 rounded-xl text-xs font-semibold text-white bg-blue-600 hover:bg-blue-700 active:scale-95 shadow-sm shadow-blue-500/20 transition-all"
+                className="inline-flex items-center gap-1.5 px-3.5 py-1.5 rounded-md text-xs font-semibold text-white bg-slate-900 hover:bg-slate-800 active:bg-slate-950 shadow-subtle transition-all"
               >
-                <span>Réserver</span>
-                <ArrowRight className="w-3.5 h-3.5" />
+                <span>Demander intervention</span>
+                <ArrowRight className="w-3 h-3 text-amber-400" />
               </button>
             </div>
           </div>
         </div>
       </div>
-    </div>
+    </article>
   );
 }

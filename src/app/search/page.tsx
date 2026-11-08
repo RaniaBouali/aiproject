@@ -6,12 +6,13 @@ import {
   Search, 
   MapPin, 
   Crosshair, 
-  SlidersHorizontal, 
   Star, 
   List, 
   Map as MapIcon,
   RefreshCw,
-  AlertCircle
+  AlertCircle,
+  SlidersHorizontal,
+  ChevronDown
 } from 'lucide-react';
 import { ProviderProfile, Category } from '@/types';
 import ProviderCard from '@/components/ProviderCard';
@@ -121,20 +122,20 @@ function SearchPageContent() {
   };
 
   return (
-    <div className="flex flex-col min-h-[calc(100vh-64px)] bg-slate-50">
+    <div className="flex flex-col min-h-[calc(100vh-64px)] bg-[#F9F9F7]">
       {/* Top Filter Bar */}
-      <div className="bg-white border-b border-slate-200 sticky top-16 z-30 shadow-sm">
-        <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-3.5">
-          <form onSubmit={handleSearchSubmit} className="flex flex-wrap items-center gap-3">
+      <div className="bg-white border-b border-stone-200 sticky top-16 z-30 shadow-subtle">
+        <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-3">
+          <form onSubmit={handleSearchSubmit} className="flex flex-wrap items-center gap-2.5">
             {/* Search Input */}
             <div className="relative flex-1 min-w-[200px]">
-              <Search className="w-4 h-4 text-slate-400 absolute left-3.5 top-1/2 -translate-y-1/2" />
+              <Search className="w-4 h-4 text-slate-400 absolute left-3 top-1/2 -translate-y-1/2" />
               <input
                 type="text"
-                placeholder="Ex: Révision frein, vidange, repassage..."
+                placeholder="Mot-clé (ex: vidange, fuite d'eau, repassage...)"
                 value={query}
                 onChange={(e) => setQuery(e.target.value)}
-                className="w-full pl-9 pr-3 py-2 text-xs sm:text-sm bg-slate-100/80 border border-slate-200 rounded-xl focus:bg-white focus:ring-2 focus:ring-blue-500 outline-none"
+                className="w-full pl-9 pr-3 py-1.5 text-xs bg-stone-50 border border-stone-200 rounded-md focus:bg-white focus:border-slate-800 outline-none transition-colors"
               />
             </div>
 
@@ -143,9 +144,9 @@ function SearchPageContent() {
               <select
                 value={selectedCategory}
                 onChange={(e) => setSelectedCategory(e.target.value)}
-                className="px-3 py-2 text-xs sm:text-sm bg-slate-100/80 border border-slate-200 rounded-xl font-medium text-slate-800 focus:bg-white focus:ring-2 focus:ring-blue-500 outline-none cursor-pointer"
+                className="px-2.5 py-1.5 text-xs bg-stone-50 border border-stone-200 rounded-md font-medium text-slate-800 focus:bg-white focus:border-slate-800 outline-none cursor-pointer"
               >
-                <option value="all">Toutes spécialités</option>
+                <option value="all">Tous les corps d&apos;état</option>
                 {categories.map((c) => (
                   <option key={c.id} value={c.slug}>
                     {c.name}
@@ -155,9 +156,9 @@ function SearchPageContent() {
             </div>
 
             {/* Radius Control */}
-            <div className="hidden lg:flex items-center gap-2 px-3 py-1.5 bg-slate-100/80 rounded-xl border border-slate-200 text-xs">
-              <span className="text-slate-500 font-medium">Rayon:</span>
-              <span className="font-bold text-blue-600">{radiusKm} km</span>
+            <div className="hidden lg:flex items-center gap-2 px-2.5 py-1 bg-stone-50 rounded-md border border-stone-200 text-xs">
+              <span className="text-slate-500 font-mono text-[11px]">Rayon:</span>
+              <span className="font-bold text-slate-900 font-mono text-[11px] tabular-nums">{radiusKm} km</span>
               <input
                 type="range"
                 min="2"
@@ -165,7 +166,7 @@ function SearchPageContent() {
                 step="2"
                 value={radiusKm}
                 onChange={(e) => setRadiusKm(Number(e.target.value))}
-                className="w-20 accent-blue-600 cursor-pointer h-1.5 bg-slate-300 rounded"
+                className="w-20 accent-amber-600 cursor-pointer h-1.5 bg-stone-200 rounded"
               />
             </div>
 
@@ -174,9 +175,9 @@ function SearchPageContent() {
               <select
                 value={minRating}
                 onChange={(e) => setMinRating(Number(e.target.value))}
-                className="px-3 py-2 text-xs sm:text-sm bg-slate-100/80 border border-slate-200 rounded-xl font-medium text-slate-800 focus:bg-white focus:ring-2 focus:ring-blue-500 outline-none cursor-pointer"
+                className="px-2.5 py-1.5 text-xs bg-stone-50 border border-stone-200 rounded-md font-medium text-slate-800 focus:bg-white focus:border-slate-800 outline-none cursor-pointer"
               >
-                <option value="0">Toutes les notes</option>
+                <option value="0">Toutes évaluations</option>
                 <option value="4">★ 4.0 et plus</option>
                 <option value="4.5">★ 4.5 et plus</option>
                 <option value="4.8">★ 4.8 et plus</option>
@@ -188,56 +189,56 @@ function SearchPageContent() {
               <select
                 value={sortBy}
                 onChange={(e) => setSortBy(e.target.value as any)}
-                className="px-3 py-2 text-xs sm:text-sm bg-slate-100/80 border border-slate-200 rounded-xl font-medium text-slate-800 focus:bg-white focus:ring-2 focus:ring-blue-500 outline-none cursor-pointer"
+                className="px-2.5 py-1.5 text-xs bg-stone-50 border border-stone-200 rounded-md font-medium text-slate-800 focus:bg-white focus:border-slate-800 outline-none cursor-pointer"
               >
                 <option value="distance">Trier par proximité</option>
-                <option value="rating">Trier par note</option>
-                <option value="reviews">Trier par nombre d'avis</option>
-                <option value="price_asc">Prix croissant</option>
+                <option value="rating">Trier par avis client</option>
+                <option value="reviews">Trier par volume d&apos;avis</option>
+                <option value="price_asc">Tarif le plus bas</option>
               </select>
             </div>
 
-            {/* Locate Me Button */}
+            {/* GPS Locate */}
             <button
               type="button"
               onClick={handleLocateMe}
-              title="Centrer la recherche sur mon GPS"
-              className="px-3 py-2 text-xs font-semibold text-blue-600 bg-blue-50 hover:bg-blue-100 border border-blue-200 rounded-xl flex items-center gap-1.5 transition shrink-0"
+              title="Centrer la recherche sur ma position"
+              className="px-2.5 py-1.5 text-xs font-semibold text-slate-800 bg-stone-100 hover:bg-stone-200 border border-stone-200 rounded-md flex items-center gap-1.5 transition shrink-0"
             >
               <Crosshair className={`w-3.5 h-3.5 ${isLocating ? 'animate-spin' : ''}`} />
               <span className="hidden sm:inline">Autour de moi</span>
             </button>
 
-            {/* Search Submit */}
+            {/* Apply Button */}
             <button
               type="submit"
-              className="px-4 py-2 bg-blue-600 hover:bg-blue-700 text-white text-xs font-bold rounded-xl shadow transition shrink-0"
+              className="px-3.5 py-1.5 bg-slate-900 hover:bg-slate-800 active:bg-slate-950 text-white text-xs font-semibold rounded-md shadow-subtle transition shrink-0"
             >
-              Actualiser
+              Filtrer
             </button>
           </form>
         </div>
       </div>
 
       {/* Mobile Switcher (List vs Map) */}
-      <div className="lg:hidden flex items-center justify-center p-2 bg-white border-b border-slate-200">
-        <div className="inline-flex rounded-xl bg-slate-100 p-1 border border-slate-200 text-xs font-semibold">
+      <div className="lg:hidden flex items-center justify-center p-2 bg-white border-b border-stone-200">
+        <div className="inline-flex rounded-md bg-stone-100 p-0.5 border border-stone-200 text-xs font-semibold">
           <button
             onClick={() => setMobileView('list')}
-            className={`flex items-center gap-1.5 px-4 py-1.5 rounded-lg transition ${
+            className={`flex items-center gap-1.5 px-3 py-1 rounded transition ${
               mobileView === 'list'
-                ? 'bg-white text-blue-600 shadow-sm'
+                ? 'bg-white text-slate-900 shadow-subtle'
                 : 'text-slate-600 hover:text-slate-900'
             }`}
           >
             <List className="w-3.5 h-3.5" />
-            <span>Liste ({providers.length})</span>
+            <span>Fiches ({providers.length})</span>
           </button>
           <button
             onClick={() => setMobileView('map')}
-            className={`flex items-center gap-1.5 px-4 py-1.5 rounded-lg transition ${
+            className={`flex items-center gap-1.5 px-3 py-1 rounded transition ${
               mobileView === 'map'
-                ? 'bg-white text-blue-600 shadow-sm'
+                ? 'bg-white text-slate-900 shadow-subtle'
                 : 'text-slate-600 hover:text-slate-900'
             }`}
           >
@@ -248,28 +249,28 @@ function SearchPageContent() {
       </div>
 
       {/* Main Content: Split View */}
-      <div className="flex-1 max-w-7xl mx-auto w-full px-4 sm:px-6 lg:px-8 py-6">
-        <div className="grid grid-cols-1 lg:grid-cols-12 gap-6 h-full items-start">
+      <div className="flex-1 max-w-7xl mx-auto w-full px-4 sm:px-6 lg:px-8 py-5">
+        <div className="grid grid-cols-1 lg:grid-cols-12 gap-5 h-full items-start">
           {/* Left Column: Provider Cards List */}
           <div
-            className={`lg:col-span-7 space-y-4 ${
+            className={`lg:col-span-7 space-y-3.5 ${
               mobileView === 'map' ? 'hidden lg:block' : 'block'
             }`}
           >
-            <div className="flex items-center justify-between pb-2">
+            <div className="flex items-center justify-between pb-2 border-b border-stone-200">
               <div>
-                <h1 className="text-xl font-extrabold text-slate-900">
+                <h1 className="text-base font-bold text-slate-950 font-display">
                   {selectedCategory !== 'all'
                     ? categories.find((c) => c.slug === selectedCategory)?.name || 'Artisans'
-                    : 'Tous les services de proximité'}
+                    : 'Artisans & Prestataires disponibles'}
                 </h1>
-                <p className="text-xs text-slate-500">
-                  {providers.length} professionnel(s) trouvé(s) dans un rayon de {radiusKm} km
+                <p className="text-xs text-slate-500 font-mono">
+                  {providers.length} professionnel(s) identifié(s) dans le rayon de {radiusKm} km
                 </p>
               </div>
 
               {loading && (
-                <div className="flex items-center gap-1 text-xs text-blue-600 animate-pulse font-medium">
+                <div className="flex items-center gap-1.5 text-xs text-amber-700 font-mono font-medium">
                   <RefreshCw className="w-3.5 h-3.5 animate-spin" />
                   <span>Calcul spatial...</span>
                 </div>
@@ -277,11 +278,11 @@ function SearchPageContent() {
             </div>
 
             {providers.length === 0 && !loading && (
-              <div className="bg-white rounded-3xl border border-slate-200 p-8 text-center space-y-3">
-                <AlertCircle className="w-12 h-12 text-slate-300 mx-auto" />
-                <h3 className="text-base font-bold text-slate-800">Aucun prestataire dans ce périmètre</h3>
-                <p className="text-xs text-slate-500 max-w-md mx-auto">
-                  Essayez d'élargir votre rayon de recherche (ex: 35 ou 50 km) ou de réinitialiser vos filtres.
+              <div className="bg-white rounded-lg border border-stone-200 p-8 text-center space-y-3 shadow-subtle">
+                <AlertCircle className="w-10 h-10 text-stone-400 mx-auto" />
+                <h3 className="text-sm font-bold text-slate-900">Aucun professionnel dans ce secteur</h3>
+                <p className="text-xs text-slate-600 max-w-sm mx-auto">
+                  Aucun artisan ne couvre actuellement ce périmètre exact. Élargissez le rayon ou changez de spécialité.
                 </p>
                 <button
                   onClick={() => {
@@ -289,14 +290,14 @@ function SearchPageContent() {
                     setSelectedCategory('all');
                     setMinRating(0);
                   }}
-                  className="px-4 py-2 bg-blue-50 text-blue-600 font-semibold text-xs rounded-xl hover:bg-blue-100 transition"
+                  className="px-3.5 py-1.5 bg-stone-100 hover:bg-stone-200 text-slate-900 font-semibold text-xs rounded border border-stone-300 transition"
                 >
-                  Élargir à 45 km
+                  Élargir le périmètre à 45 km
                 </button>
               </div>
             )}
 
-            <div className="space-y-4">
+            <div className="space-y-3">
               {providers.map((provider) => (
                 <div
                   key={provider.id}
@@ -315,18 +316,18 @@ function SearchPageContent() {
 
           {/* Right Column: Interactive Map */}
           <div
-            className={`lg:col-span-5 lg:sticky lg:top-36 h-[500px] lg:h-[calc(100vh-170px)] ${
+            className={`lg:col-span-5 lg:sticky lg:top-36 h-[480px] lg:h-[calc(100vh-160px)] ${
               mobileView === 'list' ? 'hidden lg:block' : 'block'
             }`}
           >
-            <div className="w-full h-full bg-white rounded-3xl overflow-hidden border border-slate-200/80 shadow-md flex flex-col">
-              <div className="px-4 py-2.5 bg-slate-900 text-white flex items-center justify-between text-xs font-semibold">
+            <div className="w-full h-full bg-white rounded-lg overflow-hidden border border-stone-300 shadow-card flex flex-col">
+              <div className="px-3.5 py-2 bg-slate-950 text-white flex items-center justify-between text-xs font-semibold font-mono">
                 <div className="flex items-center gap-1.5">
-                  <MapPin className="w-3.5 h-3.5 text-blue-400" />
-                  <span>Visualisation Géographique & Rayon de Couverture</span>
+                  <MapPin className="w-3.5 h-3.5 text-amber-400" />
+                  <span className="text-[11px]">Couverture Géodésique</span>
                 </div>
-                <span className="text-[11px] text-slate-400 font-normal">
-                  {providers.length} repères
+                <span className="text-[10px] text-slate-400">
+                  {providers.length} repères actifs
                 </span>
               </div>
               <div className="flex-1 relative">
@@ -355,7 +356,7 @@ function SearchPageContent() {
 
 export default function SearchPage() {
   return (
-    <Suspense fallback={<div className="p-12 text-center text-slate-400 text-sm">Chargement du moteur spatial...</div>}>
+    <Suspense fallback={<div className="p-12 text-center text-slate-400 text-xs font-mono">Initialisation du moteur cartographique...</div>}>
       <SearchPageContent />
     </Suspense>
   );

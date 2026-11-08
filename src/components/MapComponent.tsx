@@ -53,7 +53,7 @@ export default function MapComponent({
         L.tileLayer('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png', {
           maxZoom: 19,
           attribution:
-            '&copy; <a href="https://www.openstreetmap.org/copyright">OpenStreetMap</a> contributors',
+            '&copy; <a href="https://www.openstreetmap.org/copyright">OpenStreetMap</a>',
         }).addTo(map);
 
         mapInstanceRef.current = map;
@@ -75,27 +75,27 @@ export default function MapComponent({
       const userIcon = L.divIcon({
         className: 'user-marker',
         html: `
-          <div style="background-color: #2563eb; width: 18px; height: 18px; border-radius: 50%; border: 3px solid white; box-shadow: 0 0 10px rgba(37,99,235,0.6);"></div>
+          <div style="background-color: #0F172A; width: 16px; height: 16px; border-radius: 50%; border: 3px solid #D97706; box-shadow: 0 0 8px rgba(15,23,42,0.5);"></div>
         `,
-        iconSize: [18, 18],
-        iconAnchor: [9, 9],
+        iconSize: [16, 16],
+        iconAnchor: [8, 8],
       });
 
       L.marker([center.latitude, center.longitude], { icon: userIcon })
         .addTo(markersLayer)
-        .bindPopup('<b>Votre position de recherche</b>');
+        .bindPopup('<b style="font-size:12px; font-family:sans-serif;">Centre de recherche actuel</b>');
 
       if (radiusCircleRef.current) {
         radiusCircleRef.current.remove();
       }
 
       radiusCircleRef.current = L.circle([center.latitude, center.longitude], {
-        radius: radiusKm * 1000, // convert km to meters
-        color: '#3b82f6',
-        fillColor: '#93c5fd',
-        fillOpacity: 0.12,
+        radius: radiusKm * 1000,
+        color: '#B45309',
+        fillColor: '#FBBF24',
+        fillOpacity: 0.08,
         weight: 1.5,
-        dashArray: '6, 6',
+        dashArray: '4, 4',
       }).addTo(markersLayer);
 
       // 2. Add Provider markers
@@ -106,29 +106,30 @@ export default function MapComponent({
           className: 'provider-custom-pin',
           html: `
             <div style="
-              background-color: ${isSelected ? '#1d4ed8' : '#0f172a'};
+              background-color: ${isSelected ? '#D97706' : '#0F172A'};
               color: white;
-              padding: 4px 8px;
-              border-radius: 12px;
+              padding: 3px 8px;
+              border-radius: 6px;
               font-size: 11px;
               font-weight: 700;
-              border: 2px solid white;
-              box-shadow: 0 4px 12px rgba(0,0,0,0.25);
+              font-family: -apple-system, BlinkMacSystemFont, sans-serif;
+              border: 1.5px solid ${isSelected ? '#FFFFFF' : '#475569'};
+              box-shadow: 0 2px 6px rgba(0,0,0,0.3);
               white-space: nowrap;
               display: flex;
               align-items: center;
               gap: 4px;
               cursor: pointer;
-              transform: ${isSelected ? 'scale(1.15)' : 'scale(1)'};
-              transition: transform 0.2s;
+              transform: ${isSelected ? 'scale(1.12)' : 'scale(1)'};
+              transition: transform 0.15s ease-out;
             ">
-              <span>★ ${prov.ratingAverage.toFixed(1)}</span>
-              <span>•</span>
+              <span style="color: ${isSelected ? '#FFFFFF' : '#FBBF24'};">★ ${prov.ratingAverage.toFixed(1)}</span>
+              <span style="opacity: 0.6;">&bull;</span>
               <span>${prov.name.split(' ')[0]}</span>
             </div>
           `,
-          iconSize: [80, 30],
-          iconAnchor: [40, 15],
+          iconSize: [84, 26],
+          iconAnchor: [42, 13],
         });
 
         const marker = L.marker([prov.latitude, prov.longitude], {
@@ -136,31 +137,31 @@ export default function MapComponent({
         }).addTo(markersLayer);
 
         const popupContent = `
-          <div style="font-family: inherit; width: 220px;">
+          <div style="font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif; width: 220px; padding: 4px 2px;">
             <div style="display: flex; align-items: center; gap: 8px; margin-bottom: 8px;">
-              <img src="${prov.avatar}" style="width: 44px; height: 44px; border-radius: 10px; object-fit: cover;" />
-              <div>
-                <h4 style="margin: 0; font-size: 14px; font-weight: 700; color: #0f172a;">${prov.name}</h4>
-                <p style="margin: 0; font-size: 11px; color: #2563eb; font-weight: 600;">${prov.categories[0]?.name || 'Artisan'}</p>
-                <div style="font-size: 11px; color: #64748b;">
-                  📍 ${formatDistance(prov.distanceKm)} de vous
+              <img src="${prov.avatar}" style="width: 42px; height: 42px; border-radius: 6px; object-fit: cover; border: 1px solid #CBD5E1;" />
+              <div style="min-width: 0; flex: 1;">
+                <h4 style="margin: 0; font-size: 13px; font-weight: 700; color: #0F172A; white-space: nowrap; overflow: hidden; text-overflow: ellipsis;">${prov.name}</h4>
+                <p style="margin: 0; font-size: 11px; color: #B45309; font-weight: 600;">${prov.categories[0]?.name || 'Artisan'}</p>
+                <div style="font-size: 10px; color: #64748B; font-family: monospace;">
+                  ${formatDistance(prov.distanceKm)} de votre secteur
                 </div>
               </div>
             </div>
-            <p style="font-size: 11px; color: #475569; margin: 0 0 10px 0; line-height: 1.3;">${prov.bio.substring(0, 75)}...</p>
+            <p style="font-size: 11px; color: #475569; margin: 0 0 8px 0; line-height: 1.35;">${prov.bio.substring(0, 75)}...</p>
             <div style="display: flex; gap: 6px;">
               <a href="/providers/${prov.id}" style="
                 flex: 1;
                 display: block;
                 text-align: center;
-                background-color: #2563eb;
+                background-color: #0F172A;
                 color: white;
                 text-decoration: none;
-                padding: 6px 10px;
-                border-radius: 8px;
+                padding: 5px 8px;
+                border-radius: 4px;
                 font-size: 11px;
                 font-weight: 600;
-              ">Voir le profil</a>
+              ">Voir la fiche</a>
             </div>
           </div>
         `;
@@ -183,7 +184,7 @@ export default function MapComponent({
   }, [center, radiusKm, providers, selectedProviderId]);
 
   return (
-    <div className="relative w-full h-full min-h-[420px] rounded-2xl overflow-hidden shadow-inner border border-slate-200">
+    <div className="relative w-full h-full min-h-[420px] rounded-lg overflow-hidden border border-stone-300">
       <div ref={mapContainerRef} className="w-full h-full" />
     </div>
   );
